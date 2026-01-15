@@ -3,63 +3,42 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 // Type definition for headers
 type CorsHeaders = Record<string, string>;
 
-// Lista de origens permitidas em produção
-const ALLOWED_ORIGINS = [
-  'https://rvcar.vercel.app',
-  'https://www.rvcarlocacoes.com.br',
-  'https://rvcarlocacoes.com.br',
-  'https://rvcar-production.up.railway.app',
-];
+// Lista completa de headers permitidos
+const ALLOWED_HEADERS = [
+  'Content-Type',
+  'Authorization', 
+  'X-Requested-With',
+  'Cache-Control',
+  'Pragma',
+  'Expires',
+  'X-Seed-Secret',
+  'X-CSRF-Token',
+  'Accept',
+  'Accept-Language',
+  'Accept-Encoding',
+  'Origin',
+  'Host',
+  'Referer',
+  'User-Agent',
+  'DNT',
+  'Connection',
+  'Keep-Alive',
+].join(', ');
 
 /**
- * Configura headers CORS baseado no ambiente
+ * Configura headers CORS - versão simplificada e permissiva
  */
 export function getCorsHeaders(req: VercelRequest): CorsHeaders {
-  const origin = (req.headers.origin as string) || '';
-  const host = req.headers.host || '';
+  const origin = (req.headers.origin as string) || '*';
   
-  // Detectar ambiente de produção
-  const isProduction = 
-    !host.includes('localhost') &&
-    !host.includes('127.0.0.1') &&
-    !host.match(/192\.168\.\d+\.\d+/) &&
-    !host.match(/10\.\d+\.\d+\.\d+/);
-
-  const headers: CorsHeaders = {
+  return {
     'Content-Type': 'application/json; charset=utf-8',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, Cache-Control, Pragma, X-CSRF-Token, X-Seed-Secret',
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Credentials': 'true',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD',
+    'Access-Control-Allow-Headers': ALLOWED_HEADERS,
     'Access-Control-Max-Age': '86400',
   };
-
-  if (isProduction) {
-    // Verificar se a origem está na lista de permitidas
-    if (origin && ALLOWED_ORIGINS.includes(origin)) {
-      headers['Access-Control-Allow-Origin'] = origin;
-      headers['Access-Control-Allow-Credentials'] = 'true';
-    } else if (origin) {
-      // Se não está na lista mas tem origin, usar a primeira origem permitida
-      headers['Access-Control-Allow-Origin'] = ALLOWED_ORIGINS[0];
-    } else {
-      // Sem origin (ex: curl, Postman)
-      headers['Access-Control-Allow-Origin'] = '*';
-    }
-  } else {
-    // Desenvolvimento: permitir origens locais
-    const isLocal = origin.match(/^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?$/);
-    
-    if (origin && isLocal) {
-      headers['Access-Control-Allow-Origin'] = origin;
-      headers['Access-Control-Allow-Credentials'] = 'true';
-    } else if (origin && ALLOWED_ORIGINS.includes(origin)) {
-      headers['Access-Control-Allow-Origin'] = origin;
-      headers['Access-Control-Allow-Credentials'] = 'true';
-    } else {
-      headers['Access-Control-Allow-Origin'] = '*';
-    }
-  }
-
-  return headers;
 }
 
 /**

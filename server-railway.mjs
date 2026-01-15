@@ -81,30 +81,58 @@ if (process.env.FRONTEND_URL) {
   ALLOWED_ORIGINS.push(process.env.FRONTEND_URL);
 }
 
-// Middlewares
+// Lista completa de headers permitidos
+const ALLOWED_HEADERS = [
+  'Content-Type',
+  'Authorization', 
+  'X-Requested-With',
+  'Cache-Control',
+  'Pragma',
+  'Expires',
+  'X-Seed-Secret',
+  'X-CSRF-Token',
+  'Accept',
+  'Accept-Language',
+  'Accept-Encoding',
+  'Origin',
+  'Host',
+  'Referer',
+  'User-Agent',
+  'DNT',
+  'Connection',
+  'Keep-Alive',
+];
+
+// Middlewares - CORS permissivo para evitar problemas
 app.use(cors({
-  origin: function(origin, callback) {
-    // Permitir requisições sem origin (ex: mobile apps, curl, Postman)
-    if (!origin) return callback(null, true);
-    
-    // Verificar se a origem está na lista permitida
-    if (ALLOWED_ORIGINS.includes(origin)) {
-      return callback(null, true);
-    }
-    
-    // Permitir origens locais em desenvolvimento
-    if (origin.match(/^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?$/)) {
-      return callback(null, true);
-    }
-    
-    // Log para debug
-    console.log('CORS blocked origin:', origin);
-    return callback(null, false);
-  },
+  origin: true, // Aceita qualquer origem
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'Pragma', 'X-Seed-Secret', 'X-CSRF-Token']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
+  allowedHeaders: ALLOWED_HEADERS,
+  exposedHeaders: ['Content-Length', 'Content-Type'],
+  maxAge: 86400, // 24 horas
 }));
+
+// Fallback manual para CORS em caso de problemas
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD');
+  res.setHeader('Access-Control-Allow-Headers', ALLOWED_HEADERS.join(', '));
+  res.setHeader('Access-Control-Max-Age', '86400');
+  
+  // Responder imediatamente a OPTIONS
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+  next();
+});
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
