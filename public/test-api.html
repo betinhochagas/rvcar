@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RV Car - Teste de Conexão API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .info { 
+            background: #e3f2fd; 
+            padding: 15px; 
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success { 
+            background: #c8e6c9; 
+            padding: 15px; 
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .error { 
+            background: #ffcdd2; 
+            padding: 15px; 
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+        #log {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .vehicle-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚗 RV Car - Teste de API</h1>
+        
+        <div class="info">
+            <strong>📍 Localização:</strong>
+            <p>Hostname: <span id="hostname"></span></p>
+            <p>User Agent: <span id="userAgent"></span></p>
+        </div>
+
+        <div class="info">
+            <strong>🔗 URLs Detectadas:</strong>
+            <p>URL da API: <span id="apiUrl"></span></p>
+        </div>
+
+        <button onclick="testConnection()">🔍 Testar Conexão</button>
+        <button onclick="fetchVehicles()">🚗 Buscar Veículos</button>
+        <button onclick="clearLog()">🗑️ Limpar Log</button>
+
+        <div id="result"></div>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        // Detectar ambiente e URLs
+        const hostname = window.location.hostname;
+        const apiUrl = `http://${hostname}:3000/api/vehicles`;
+        
+        document.getElementById('hostname').textContent = hostname;
+        document.getElementById('userAgent').textContent = navigator.userAgent.includes('Mobile') ? '📱 Mobile' : '💻 Desktop';
+        document.getElementById('apiUrl').textContent = apiUrl;
+
+        let logContainer = document.getElementById('log');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#f44336' : type === 'success' ? '#4caf50' : '#2196F3';
+            logContainer.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logContainer.scrollTop = logContainer.scrollHeight;
+            console.log(message);
+        }
+
+        function clearLog() {
+            logContainer.innerHTML = '';
+        }
+
+        async function testConnection() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="info">⏳ Testando conexão...</div>';
+            log('Iniciando teste de conexão...', 'info');
+            
+            try {
+                log(`Tentando conectar em: ${apiUrl}`, 'info');
+                
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                log(`Status HTTP: ${response.status}`, response.ok ? 'success' : 'error');
+                log(`Status Text: ${response.statusText}`, 'info');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Conexão OK! Recebidos ${data.length} veículos`, 'success');
+                    
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Conexão Estabelecida!</h3>
+                            <p>Status: ${response.status}</p>
+                            <p>Veículos encontrados: ${data.length}</p>
+                        </div>
+                    `;
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ Erro HTTP: ${errorText}`, 'error');
+                    
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Erro de Conexão</h3>
+                            <p>Status: ${response.status}</p>
+                            <p>Erro: ${errorText}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                log(`❌ Erro fatal: ${error.message}`, 'error');
+                log(`Stack: ${error.stack}`, 'error');
+                
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Erro Fatal</h3>
+                        <p>${error.message}</p>
+                        <br>
+                        <p><strong>Possíveis causas:</strong></p>
+                        <ul>
+                            <li>Servidor backend não está rodando</li>
+                            <li>Firewall bloqueando a porta</li>
+                            <li>Celular não está na mesma rede WiFi</li>
+                            <li>IP do PC mudou</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        async function fetchVehicles() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="info">⏳ Buscando veículos...</div>';
+            log('Buscando lista de veículos...', 'info');
+            
+            try {
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const vehicles = await response.json();
+                log(`✅ ${vehicles.length} veículos carregados`, 'success');
+                
+                let vehiclesHTML = '<div class="success"><h3>✅ Veículos Encontrados:</h3></div>';
+                
+                vehicles.forEach(vehicle => {
+                    vehiclesHTML += `
+                        <div class="vehicle-card">
+                            <h4>${vehicle.name}</h4>
+                            <p>💰 ${vehicle.price}</p>
+                            <p>📝 ${vehicle.features.length} características</p>
+                            <p>✅ ${vehicle.available ? 'Disponível' : 'Indisponível'}</p>
+                        </div>
+                    `;
+                    log(`Veículo: ${vehicle.name} - ${vehicle.price}`, 'success');
+                });
+                
+                resultDiv.innerHTML = vehiclesHTML;
+            } catch (error) {
+                log(`❌ Erro ao buscar veículos: ${error.message}`, 'error');
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Erro ao Buscar Veículos</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Teste automático ao carregar
+        window.onload = function() {
+            log('='.repeat(50), 'info');
+            log('🚗 RV Car - Teste de API', 'info');
+            log('='.repeat(50), 'info');
+            log(`Hostname: ${hostname}`, 'info');
+            log(`API URL: ${apiUrl}`, 'info');
+            log(`Dispositivo: ${navigator.userAgent.includes('Mobile') ? 'Mobile' : 'Desktop'}`, 'info');
+            log('='.repeat(50), 'info');
+        };
+    </script>
+</body>
+</html>
