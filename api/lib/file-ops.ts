@@ -74,8 +74,15 @@ export async function readJsonFile<T>(filePath: string, defaultValue?: T): Promi
     if (!content || content.trim() === '') {
       return defaultValue !== undefined ? defaultValue : {} as T;
     }
-    const data = JSON.parse(content);
-    console.log(`[readJsonFile] Parse OK, keys: ${Object.keys(data).length}`);
+    let data = JSON.parse(content);
+    
+    // CORREÇÃO: Se defaultValue é objeto e data é array, converter para objeto
+    if (defaultValue !== undefined && !Array.isArray(defaultValue) && Array.isArray(data)) {
+      console.log(`[readJsonFile] Convertendo array para objeto`);
+      data = {};
+    }
+    
+    console.log(`[readJsonFile] Parse OK, tipo: ${Array.isArray(data) ? 'array' : 'object'}`);
     return data as T;
   } catch (error) {
     console.error(`[readJsonFile] ERRO ao ler arquivo ${filePath}:`, error);
