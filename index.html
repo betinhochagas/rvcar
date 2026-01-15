@@ -14,15 +14,15 @@
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       font-src 'self' https://fonts.gstatic.com;
       img-src 'self' data: https: http:;
-      connect-src 'self' https://*.railway.app https://rvcar-production.up.railway.app http://localhost:* http://192.168.*:* http://10.*:*;
+      connect-src 'self' https://*.railway.app https://rvcar-production.up.railway.app http://localhost:* http://127.0.0.1:*;
       frame-ancestors 'none';
       base-uri 'self';
       form-action 'self';
     " />
     
-    <title>Carregando...</title>
-    <meta name="description" content="Sistema de gestão empresarial com painel administrativo completo" />
-    <meta name="author" content="Sistema Empresarial" />
+    <title>RV Car - Locações e Investimentos</title>
+    <meta name="description" content="Aluguel de carros para motoristas de app desde R$650/semana. Invista em frotas com renda passiva garantida." />
+    <meta name="author" content="RV Car" />
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -33,15 +33,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
-    <meta property="og:title" content="Sistema Empresarial | Painel Administrativo" />
-    <meta property="og:description" content="Aluguel de carros para motoristas de app desde R$650/semana. Invista em frotas com renda passiva garantida." />
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/favicon.png" />
+    <meta property="og:url" content="https://www.rvcarlocacoes.com.br/" />
+    <meta property="og:title" content="RV Car - Locações e Investimentos" />
+    <meta property="og:description" content="Aluguel de carros para motoristas de app desde R$650/semana. Invista em frotas com renda passiva garantida." />
+    <meta property="og:image" content="https://www.rvcarlocacoes.com.br/og-image.png" />
+    <meta property="og:site_name" content="RV Car" />
+    <meta property="og:locale" content="pt_BR" />
 
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Sistema Empresarial" />
-    <meta name="twitter:description" content="Aluguel de carros para app e investimento em frotas" />
-    <meta name="twitter:image" content="/favicon.png" />
+    <meta name="twitter:url" content="https://www.rvcarlocacoes.com.br/" />
+    <meta name="twitter:title" content="RV Car - Locações e Investimentos" />
+    <meta name="twitter:description" content="Aluguel de carros para motoristas de app desde R$650/semana. Invista em frotas com renda passiva garantida." />
+    <meta name="twitter:image" content="https://www.rvcarlocacoes.com.br/og-image.png" />
     
     <!-- Carregar configurações antes do React -->
     <script>
