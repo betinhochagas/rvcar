@@ -17,19 +17,19 @@ export default async function handler(req, res) {
     try {
         // Verificar storage
         const storageStatus = await checkStorage();
-        // Verificar variáveis de ambiente críticas
-        const envStatus = {
-            KV_REST_API_URL: !!process.env.KV_REST_API_URL,
-            BLOB_READ_WRITE_TOKEN: !!process.env.BLOB_READ_WRITE_TOKEN,
-            VERCEL: process.env.VERCEL === '1',
+        // Info do ambiente
+        const envInfo = {
+            NODE_ENV: process.env.NODE_ENV || 'development',
+            RAILWAY_ENVIRONMENT: process.env.RAILWAY_ENVIRONMENT || 'none',
+            PORT: process.env.PORT || '3000',
         };
         const isHealthy = storageStatus.available;
         return sendResponse(res, req, {
             status: isHealthy ? 'healthy' : 'degraded',
             timestamp: new Date().toISOString(),
-            environment: process.env.VERCEL === '1' ? 'production' : 'development',
+            environment: process.env.NODE_ENV || 'development',
             storage: storageStatus,
-            env: envStatus,
+            env: envInfo,
             version: '1.0.0',
         }, isHealthy ? 200 : 503);
     }

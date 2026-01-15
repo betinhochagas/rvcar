@@ -1,39 +1,24 @@
 /**
- * Storage Module - Abstração para persistência de dados
+ * Storage Module - Persistência de dados usando arquivos JSON
  * 
- * Em desenvolvimento: usa arquivos JSON locais
- * Em produção (Vercel): usa Vercel KV (Redis)
+ * Para Railway: usa arquivos JSON locais com persistência em volume
  */
 
-import { kv } from '@vercel/kv';
 import fs from 'fs/promises';
 import path from 'path';
 
-// Detectar ambiente
-const isVercel = process.env.VERCEL === '1';
-const hasKV = !!process.env.KV_REST_API_URL;
+/**
+ * Obtém caminho local do arquivo de dados
+ */
+function getLocalPath(key: string): string {
+  const filename = `${key.replace(/[^a-zA-Z0-9-_]/g, '-')}.json`;
+  return path.join(process.cwd(), 'data', filename);
+}
 
 /**
- * Lê dados do storage
+ * Lê dados do storage (arquivo JSON)
  */
 export async function getData<T>(key: string, defaultValue: T): Promise<T> {
-  // Em produção com KV configurado
-  if (isVercel && hasKV) {
-    try {
-      const data = await kv.get<T>(key);
-      if (data !== null && data !== undefined) {
-        return data;
-      }
-      // Se não existe no KV, inicializar com valor padrão
-      await kv.set(key, defaultValue);
-      return defaultValue;
-    } catch (error) {
-      console.error(`[Storage] Erro ao ler KV (${key}):`, error);
-      return defaultValue;
-    }
-  }
-
-  // Em desenvolvimento: usar arquivo JSON local
   try {
     const filePath = getLocalPath(key);
     const exists = await fs.access(filePath).then(() => true).catch(() => false);
@@ -51,21 +36,9 @@ export async function getData<T>(key: string, defaultValue: T): Promise<T> {
 }
 
 /**
- * Salva dados no storage
+ * Salva dados no storage (arquivo JSON)
  */
 export async function setData<T>(key: string, data: T): Promise<boolean> {
-  // Em produção com KV configurado
-  if (isVercel && hasKV) {
-    try {
-      await kv.set(key, data);
-      return true;
-    } catch (error) {
-      console.error(`[Storage] Erro ao salvar KV (${key}):`, error);
-      return false;
-    }
-  }
-
-  // Em desenvolvimento: salvar arquivo JSON local
   try {
     const filePath = getLocalPath(key);
     const dir = path.dirname(filePath);
@@ -101,18 +74,6 @@ export async function updateData<T>(
  * Remove dados do storage
  */
 export async function deleteData(key: string): Promise<boolean> {
-  // Em produção com KV configurado
-  if (isVercel && hasKV) {
-    try {
-      await kv.del(key);
-      return true;
-    } catch (error) {
-      console.error(`[Storage] Erro ao deletar KV (${key}):`, error);
-      return false;
-    }
-  }
-
-  // Em desenvolvimento: deletar arquivo
   try {
     const filePath = getLocalPath(key);
     await fs.unlink(filePath);
@@ -128,36 +89,30 @@ export async function deleteData(key: string): Promise<boolean> {
  */
 export async function checkStorage(): Promise<{ 
   available: boolean; 
-  type: 'kv' | 'file';
+  type: 'file';
   message: string;
 }> {
-  if (isVercel && hasKV) {
-    try {
-      await kv.ping();
-      return { available: true, type: 'kv', message: 'Vercel KV conectado' };
-    } catch (error) {
-      return { 
-        available: false, 
-        type: 'kv', 
-        message: `Erro ao conectar ao KV: ${error}` 
-      };
-    }
+  try {
+    const dataDir = path.join(process.cwd(), 'data');
+    await fs.mkdir(dataDir, { recursive: true });
+    
+    // Testar escrita
+    const testFile = path.join(dataDir, '.storage-test');
+    await fs.writeFile(testFile, 'ok');
+    await fs.unlink(testFile);
+    
+    return { 
+      available: true, 
+      type: 'file', 
+      message: 'Storage de arquivos funcionando' 
+    };
+  } catch (error) {
+    return { 
+      available: false, 
+      type: 'file', 
+      message: `Erro no storage: ${error}` 
+    };
   }
-
-  return { 
-    available: true, 
-    type: 'file', 
-    message: 'Usando arquivos locais' 
-  };
-}
-
-/**
- * Obtém caminho local do arquivo de dados
- */
-function getLocalPath(key: string): string {
-  // Converter chave para nome de arquivo
-  const filename = `${key.replace(/[^a-zA-Z0-9-_]/g, '-')}.json`;
-  return path.join(process.cwd(), 'data', filename);
 }
 
 // Storage keys constants

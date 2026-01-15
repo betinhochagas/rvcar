@@ -1,8 +1,7 @@
-import { kv } from '@vercel/kv';
 import { handleOptions, isOptionsRequest, applyCorsHeaders } from './lib/cors.js';
 import { sendResponse, sendError } from './lib/response.js';
 import { validateToken, extractTokenFromHeader } from './lib/auth.js';
-import { STORAGE_KEYS } from './lib/storage.js';
+import { readJsonFile, writeJsonFile, getDataPath } from './lib/file-ops.js';
 import bcrypt from 'bcryptjs';
 // Dados iniciais
 const INITIAL_VEHICLES = [
@@ -10,7 +9,7 @@ const INITIAL_VEHICLES = [
         id: 1,
         name: "Renault Kwid",
         price: 550,
-        image: "/uploads/vehicles/vehicle_6967f6694743b0.51458340.jpeg",
+        image: "/uploads/vehicles/vehicle_default_1.jpeg",
         features: ["Econômico", "Ar Condicionado", "Direção hidráulica", "Seguro"],
         available: true,
         created_at: new Date().toISOString(),
@@ -18,9 +17,9 @@ const INITIAL_VEHICLES = [
     },
     {
         id: 2,
-        name: "Renault Kwid",
+        name: "Fiat Mobi",
         price: 450,
-        image: "/uploads/vehicles/vehicle_6967f6807684d8.55573768.jpeg",
+        image: "/uploads/vehicles/vehicle_default_2.jpeg",
         features: ["Econômico", "Ar Condicionado", "Direção hidráulica", "Seguro"],
         available: true,
         created_at: new Date().toISOString(),
@@ -40,6 +39,11 @@ const INITIAL_SETTINGS = {
     og_title: { value: "RV Car Solutions - Aluguel de Veículos", type: "text", description: "Título Open Graph" },
     og_description: { value: "Aluguel de veículos com as melhores condições do mercado.", type: "text", description: "Descrição Open Graph" }
 };
+const VEHICLES_FILE = getDataPath('vehicles.json');
+const SETTINGS_FILE = getDataPath('site-settings.json');
+const USERS_FILE = getDataPath('admin-users.json');
+const TOKENS_FILE = getDataPath('admin-tokens.json');
+const RATE_LIMITS_FILE = getDataPath('rate-limits.json');
 /**
  * Handler principal para /api/seed
  */
@@ -60,14 +64,10 @@ export default async function handler(req, res) {
 }
 /**
  * POST /api/seed
- * Inicializa dados no Vercel KV
+ * Inicializa dados usando arquivos JSON
  */
 async function handlePost(req, res) {
     try {
-        // Verificar se KV está disponível
-        if (!process.env.KV_REST_API_URL) {
-            return sendError(res, req, 'Vercel KV não configurado', 500);
-        }
         // Verificar secret key ou autenticação
         const secretKey = req.headers['x-seed-secret'];
         const expectedSecret = process.env.SEED_SECRET_KEY;
@@ -76,27 +76,30 @@ async function handlePost(req, res) {
             const authHeader = req.headers.authorization;
             const token = extractTokenFromHeader(authHeader || null);
             if (!token) {
-                return sendError(res, req, 'Não autorizado', 401);
+                return sendError(res, req, 'Não autorizado. Use X-Seed-Secret header ou autenticação admin.', 401);
             }
             const user = await validateToken(token);
             if (!user) {
                 return sendError(res, req, 'Token inválido', 401);
             }
         }
+        // Verificar parâmetro force
+        const force = req.query.force === 'true';
         // Verificar se já existem dados
-        const existingVehicles = await kv.get(STORAGE_KEYS.VEHICLES);
-        if (existingVehicles && Array.isArray(existingVehicles) && existingVehicles.length > 0) {
+        const existingVehicles = await readJsonFile(VEHICLES_FILE);
+        if (existingVehicles.length > 0 && !force) {
             return sendResponse(res, req, {
                 success: false,
-                message: 'Dados já existem. Use force=true para sobrescrever.',
+                message: 'Dados já existem. Use ?force=true para sobrescrever.',
                 existing: {
                     vehicles: existingVehicles.length
                 }
             }, 200);
         }
         // Criar usuário admin padrão se não existir
-        const existingUsers = await kv.get(STORAGE_KEYS.ADMIN_USERS);
-        if (!existingUsers || !Array.isArray(existingUsers) || existingUsers.length === 0) {
+        const existingUsers = await readJsonFile(USERS_FILE);
+        let adminCreated = false;
+        if (existingUsers.length === 0 || force) {
             const hashedPassword = await bcrypt.hash('rvcar2024', 10);
             const adminUser = {
                 id: 1,
@@ -106,26 +109,32 @@ async function handlePost(req, res) {
                 must_change_password: true,
                 created_at: new Date().toISOString()
             };
-            await kv.set(STORAGE_KEYS.ADMIN_USERS, [adminUser]);
+            await writeJsonFile(USERS_FILE, [adminUser]);
+            adminCreated = true;
         }
         // Salvar dados iniciais
-        await kv.set(STORAGE_KEYS.VEHICLES, INITIAL_VEHICLES);
-        await kv.set(STORAGE_KEYS.SITE_SETTINGS, INITIAL_SETTINGS);
-        await kv.set(STORAGE_KEYS.ADMIN_TOKENS, []);
-        await kv.set(STORAGE_KEYS.RATE_LIMITS, {});
+        await writeJsonFile(VEHICLES_FILE, INITIAL_VEHICLES);
+        await writeJsonFile(SETTINGS_FILE, INITIAL_SETTINGS);
+        await writeJsonFile(TOKENS_FILE, []);
+        await writeJsonFile(RATE_LIMITS_FILE, {});
         return sendResponse(res, req, {
             success: true,
             message: 'Dados inicializados com sucesso',
             data: {
                 vehicles: INITIAL_VEHICLES.length,
                 settings: Object.keys(INITIAL_SETTINGS).length,
-                admin_created: true
-            }
+                admin_created: adminCreated
+            },
+            credentials: adminCreated ? {
+                username: 'admin',
+                password: 'rvcar2024',
+                note: 'Troque a senha no primeiro login!'
+            } : undefined
         }, 200);
     }
     catch (error) {
         console.error('Erro ao inicializar dados:', error);
-        return sendError(res, req, `Erro ao inicializar: ${error}`, 500);
+        return sendError(res, req, `Erro ao inicializar: ${error instanceof Error ? error.message : error}`, 500);
     }
 }
 /**
@@ -134,30 +143,22 @@ async function handlePost(req, res) {
  */
 async function handleGet(req, res) {
     try {
-        const hasKV = !!process.env.KV_REST_API_URL;
-        if (!hasKV) {
-            return sendResponse(res, req, {
-                success: false,
-                message: 'Vercel KV não configurado',
-                kvConfigured: false
-            }, 200);
-        }
         // Verificar dados existentes
-        const vehicles = await kv.get(STORAGE_KEYS.VEHICLES);
-        const settings = await kv.get(STORAGE_KEYS.SITE_SETTINGS);
-        const users = await kv.get(STORAGE_KEYS.ADMIN_USERS);
+        const vehicles = await readJsonFile(VEHICLES_FILE);
+        const settings = await readJsonFile(SETTINGS_FILE);
+        const users = await readJsonFile(USERS_FILE);
         return sendResponse(res, req, {
             success: true,
-            kvConfigured: true,
+            storage: 'file',
             data: {
-                vehicles: Array.isArray(vehicles) ? vehicles.length : 0,
+                vehicles: vehicles.length,
                 settings: settings ? Object.keys(settings).length : 0,
-                users: Array.isArray(users) ? users.length : 0
+                users: users.length
             }
         }, 200);
     }
     catch (error) {
         console.error('Erro ao verificar seed:', error);
-        return sendError(res, req, `Erro: ${error}`, 500);
+        return sendError(res, req, `Erro: ${error instanceof Error ? error.message : error}`, 500);
     }
 }

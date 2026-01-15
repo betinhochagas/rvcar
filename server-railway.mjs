@@ -10,6 +10,24 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Criar diretórios necessários
+async function ensureDirectories() {
+  const dirs = [
+    join(__dirname, 'data'),
+    join(__dirname, 'uploads'),
+    join(__dirname, 'uploads', 'vehicles'),
+    join(__dirname, 'uploads', 'site'),
+  ];
+  
+  for (const dir of dirs) {
+    await fs.mkdir(dir, { recursive: true }).catch(() => {});
+  }
+  console.log('📁 Diretórios de dados criados');
+}
+
+// Inicializar diretórios
+await ensureDirectories();
+
 // Middlewares
 app.use(cors({
   origin: process.env.FRONTEND_URL || '*',

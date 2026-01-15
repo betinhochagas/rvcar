@@ -1,50 +1,48 @@
+/**
+ * File Operations - Operações com arquivos JSON
+ *
+ * Versão simplificada para Railway usando arquivos locais
+ */
 import fs from 'fs/promises';
 import path from 'path';
-import { getData, setData, STORAGE_KEYS } from './storage.js';
-// Detectar ambiente
-const isVercel = process.env.VERCEL === '1';
-const hasKV = !!process.env.KV_REST_API_URL;
-// Lockfile alternativo - implementação simplificada
+// Lock simples em memória
 const locks = new Map();
-async function lock(_lockPath) {
-    while (locks.has(_lockPath)) {
-        await locks.get(_lockPath);
+async function lock(lockPath) {
+    while (locks.has(lockPath)) {
+        await locks.get(lockPath);
         await new Promise(resolve => setTimeout(resolve, 10));
     }
+    let resolver;
     const lockPromise = new Promise(resolve => {
-        setTimeout(() => resolve(), 10000); // Timeout de 10s
+        resolver = resolve;
     });
-    locks.set(_lockPath, lockPromise);
+    locks.set(lockPath, lockPromise);
+    // Auto-unlock após 10s (safety)
+    setTimeout(() => {
+        unlock(lockPath);
+    }, 10000);
 }
-async function unlock(_lockPath) {
-    locks.delete(_lockPath);
+async function unlock(lockPath) {
+    locks.delete(lockPath);
 }
 /**
- * Converte caminho de arquivo para chave de storage
+ * Obtém caminho base para dados
  */
-function filePathToStorageKey(filePath) {
-    const basename = path.basename(filePath, '.json');
-    // Mapear nomes de arquivo para chaves de storage
-    const keyMap = {
-        'vehicles': STORAGE_KEYS.VEHICLES,
-        'site-settings': STORAGE_KEYS.SITE_SETTINGS,
-        'admin-users': STORAGE_KEYS.ADMIN_USERS,
-        'admin-tokens': STORAGE_KEYS.ADMIN_TOKENS,
-        'rate-limits': STORAGE_KEYS.RATE_LIMITS,
-    };
-    return keyMap[basename] || basename;
+export function getDataPath(filename) {
+    const dataDir = path.join(process.cwd(), 'data');
+    return filename ? path.join(dataDir, filename) : dataDir;
 }
 /**
- * Lê arquivo JSON - usa KV em produção, arquivo local em dev
+ * Obtém caminho base para uploads
+ */
+export function getUploadPath(subdir) {
+    const uploadDir = path.join(process.cwd(), 'uploads');
+    return subdir ? path.join(uploadDir, subdir) : uploadDir;
+}
+/**
+ * Lê arquivo JSON
  */
 export async function readJsonFile(filePath) {
-    // Em produção com KV: usar storage abstrato
-    if (isVercel && hasKV) {
-        const key = filePathToStorageKey(filePath);
-        const defaultValue = [];
-        return await getData(key, defaultValue);
-    }
-    // Em desenvolvimento ou sem KV: usar arquivo local
     try {
         const exists = await fs.access(filePath).then(() => true).catch(() => false);
         if (!exists) {
@@ -60,15 +58,9 @@ export async function readJsonFile(filePath) {
     }
 }
 /**
- * Escreve arquivo JSON - usa KV em produção, arquivo local em dev
+ * Escreve arquivo JSON com lock
  */
 export async function writeJsonFile(filePath, data, permissions = 0o600) {
-    // Em produção com KV: usar storage abstrato
-    if (isVercel && hasKV) {
-        const key = filePathToStorageKey(filePath);
-        return await setData(key, data);
-    }
-    // Em desenvolvimento ou sem KV: usar arquivo local
     const lockPath = `${filePath}.lock`;
     try {
         const dir = path.dirname(filePath);
@@ -89,49 +81,22 @@ export async function writeJsonFile(filePath, data, permissions = 0o600) {
     }
 }
 /**
- * Atualiza arquivo JSON de forma atômica
+ * Atualiza arquivo JSON de forma segura
  */
-export async function updateJsonFile(filePath, callback, permissions = 0o600) {
-    // Em produção com KV: usar storage abstrato
-    if (isVercel && hasKV) {
-        const key = filePathToStorageKey(filePath);
-        const defaultValue = [];
-        try {
-            const current = await getData(key, defaultValue);
-            const result = await callback(current);
-            await setData(key, current);
-            return result;
-        }
-        catch (error) {
-            console.error(`Erro ao atualizar KV (${key}):`, error);
-            return null;
-        }
-    }
-    // Em desenvolvimento ou sem KV: usar arquivo local
+export async function updateJsonFile(filePath, updater, defaultValue) {
     const lockPath = `${filePath}.lock`;
     try {
-        const dir = path.dirname(filePath);
-        await fs.mkdir(dir, { recursive: true, mode: 0o700 });
         await lock(lockPath);
         try {
-            let data;
-            const exists = await fs.access(filePath).then(() => true).catch(() => false);
-            if (exists) {
-                const content = await fs.readFile(filePath, 'utf-8');
-                data = JSON.parse(content);
-            }
-            else {
-                data = (Array.isArray({}) ? [] : {});
-            }
-            // Executar callback
-            const result = await callback(data);
-            // Escrever dados atualizados
-            const json = JSON.stringify(data, null, 2);
-            await fs.writeFile(filePath, json, { encoding: 'utf-8', mode: permissions });
-            return result;
+            const current = await readJsonFile(filePath) || defaultValue;
+            const updated = await updater(current);
+            const dir = path.dirname(filePath);
+            await fs.mkdir(dir, { recursive: true, mode: 0o700 });
+            const json = JSON.stringify(updated, null, 2);
+            await fs.writeFile(filePath, json, { encoding: 'utf-8', mode: 0o600 });
+            return updated;
         }
         finally {
-            // Sempre liberar lock
             await unlock(lockPath);
         }
     }
@@ -141,36 +106,47 @@ export async function updateJsonFile(filePath, callback, permissions = 0o600) {
     }
 }
 /**
- * Retorna o caminho absoluto para arquivos de dados
+ * Remove arquivo se existir
  */
-export function getDataPath(filename) {
-    // Em produção Vercel, usar /tmp para dados temporários
-    // Em desenvolvimento, usar ./data
-    const isVercel = process.env.VERCEL === '1';
-    if (isVercel) {
-        return path.join('/tmp', 'data', filename);
+export async function deleteFile(filePath) {
+    try {
+        await fs.unlink(filePath);
+        return true;
     }
-    return path.join(process.cwd(), 'data', filename);
+    catch (error) {
+        // Ignora erro se arquivo não existe
+        return false;
+    }
 }
 /**
- * Retorna o caminho absoluto para arquivos de logs
+ * Verifica se arquivo existe
  */
-export function getLogPath(filename) {
-    const isVercel = process.env.VERCEL === '1';
-    if (isVercel) {
-        return path.join('/tmp', 'logs', filename);
-    }
-    return path.join(process.cwd(), 'logs', filename);
+export async function fileExists(filePath) {
+    return fs.access(filePath).then(() => true).catch(() => false);
 }
 /**
- * Retorna o caminho absoluto para arquivos de upload
+ * Lista arquivos em diretório
  */
-export function getUploadPath(...segments) {
-    const isVercel = process.env.VERCEL === '1';
-    if (isVercel) {
-        // No Vercel, uploads devem ir para /tmp (temporário)
-        // ou usar Vercel Blob Storage para persistência
-        return path.join('/tmp', 'uploads', ...segments);
+export async function listFiles(dirPath) {
+    try {
+        const entries = await fs.readdir(dirPath);
+        return entries;
     }
-    return path.join(process.cwd(), 'uploads', ...segments);
+    catch {
+        return [];
+    }
+}
+/**
+ * Cria diretórios necessários
+ */
+export async function ensureDirectories() {
+    const dirs = [
+        getDataPath(),
+        getUploadPath(),
+        getUploadPath('vehicles'),
+        getUploadPath('site'),
+    ];
+    for (const dir of dirs) {
+        await fs.mkdir(dir, { recursive: true, mode: 0o755 });
+    }
 }

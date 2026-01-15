@@ -1,4 +1,3 @@
-import { put } from '@vercel/blob';
 import { handleOptions, isOptionsRequest } from './lib/cors.js';
 import { sendResponse, sendError } from './lib/response.js';
 import { validateToken, extractTokenFromHeader } from './lib/auth.js';
@@ -10,22 +9,19 @@ import fs from 'fs/promises';
 import path from 'path';
 import { nanoid } from 'nanoid';
 import { IncomingForm } from 'formidable';
-// Detectar ambiente
-const isVercel = process.env.VERCEL === '1';
-const hasBlob = !!process.env.BLOB_READ_WRITE_TOKEN;
 // Configurações
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
 const MAX_TOTAL_SIZE = 500 * 1024 * 1024; // 500MB
-// Configuração do Vercel para permitir formData
+// Configuração do body parser (desativado para uploads)
 export const config = {
     api: {
         bodyParser: false,
     },
 };
 /**
- * Calculates total upload directory size
+ * Calcula tamanho total do diretório de uploads
  */
 async function calculateTotalSize(baseDir) {
     let totalSize = 0;
@@ -90,7 +86,7 @@ export default async function handler(req, res) {
 }
 /**
  * POST /api/upload
- * Upload de imagens
+ * Upload de imagens (salva localmente)
  */
 async function handlePost(req, res) {
     try {
@@ -108,7 +104,7 @@ async function handlePost(req, res) {
         }
         // 2. Rate limiting
         const uploadIdentifier = getRateLimitIdentifier(req, 'upload');
-        const rateCheck = await checkRateLimit(uploadIdentifier, 2, 1);
+        const rateCheck = await checkRateLimit(uploadIdentifier, 10, 1); // 10 uploads por minuto
         if (!rateCheck.allowed) {
             await logSecurityEvent('Rate limit excedido no upload', 'WARNING', { user_id: user.id, username: user.username });
             return sendError(res, req, 'Muitos uploads. Aguarde um momento.', 429);
@@ -135,13 +131,11 @@ async function handlePost(req, res) {
         if (!extension || !ALLOWED_EXTENSIONS.includes(extension)) {
             return sendError(res, req, 'Extensão de arquivo não permitida. Use: JPG, PNG ou WebP', 400);
         }
-        // Verificar espaço total ocupado (apenas local)
-        if (!isVercel) {
-            const baseUploadDir = getUploadPath();
-            const currentSize = await calculateTotalSize(baseUploadDir);
-            if (currentSize + file.size > MAX_TOTAL_SIZE) {
-                return sendError(res, req, 'Limite de armazenamento atingido. Remova arquivos antigos.', 507);
-            }
+        // Verificar espaço total ocupado
+        const baseUploadDir = getUploadPath();
+        const currentSize = await calculateTotalSize(baseUploadDir);
+        if (currentSize + file.size > MAX_TOTAL_SIZE) {
+            return sendError(res, req, 'Limite de armazenamento atingido. Remova arquivos antigos.', 507);
         }
         // Ler arquivo
         const buffer = await fs.readFile(file.filepath);
@@ -159,44 +153,32 @@ async function handlePost(req, res) {
         }
         // Gerar nome único
         const uniqueId = nanoid(10);
-        const filename = `${uniqueId}.${metadata.format || extension}`;
+        const outputFormat = metadata.format === 'png' ? 'png' : 'jpeg';
+        const filename = `${uniqueId}.${outputFormat}`;
         // Otimizar imagem com Sharp
-        const optimizedBuffer = await sharp(buffer)
-            .resize(1920, 1080, { fit: 'inside', withoutEnlargement: true })
-            .jpeg({ quality: 85 })
-            .png({ compressionLevel: 9 })
-            .webp({ quality: 85 })
-            .toBuffer();
-        let webPath;
-        // Em produção com Blob: usar Vercel Blob Storage
-        if (isVercel && hasBlob) {
-            try {
-                const blobPath = type === 'vehicle'
-                    ? `uploads/vehicles/${filename}`
-                    : `uploads/site/${filename}`;
-                const blob = await put(blobPath, optimizedBuffer, {
-                    access: 'public',
-                    contentType: file.mimetype || 'image/jpeg',
-                });
-                webPath = blob.url;
-            }
-            catch (error) {
-                console.error('Erro ao salvar no Vercel Blob:', error);
-                return sendError(res, req, 'Erro ao salvar arquivo', 500);
-            }
+        let optimizedBuffer;
+        if (outputFormat === 'png') {
+            optimizedBuffer = await sharp(buffer)
+                .resize(1920, 1080, { fit: 'inside', withoutEnlargement: true })
+                .png({ compressionLevel: 9 })
+                .toBuffer();
         }
         else {
-            // Em desenvolvimento: salvar localmente
-            const uploadDir = type === 'vehicle'
-                ? getUploadPath('vehicles')
-                : getUploadPath('site');
-            await fs.mkdir(uploadDir, { recursive: true, mode: 0o755 });
-            const filepath = path.join(uploadDir, filename);
-            await fs.writeFile(filepath, optimizedBuffer);
-            webPath = type === 'vehicle'
-                ? `/uploads/vehicles/${filename}`
-                : `/uploads/site/${filename}`;
+            optimizedBuffer = await sharp(buffer)
+                .resize(1920, 1080, { fit: 'inside', withoutEnlargement: true })
+                .jpeg({ quality: 85 })
+                .toBuffer();
         }
+        // Salvar localmente
+        const uploadDir = type === 'vehicle'
+            ? getUploadPath('vehicles')
+            : getUploadPath('site');
+        await fs.mkdir(uploadDir, { recursive: true, mode: 0o755 });
+        const filepath = path.join(uploadDir, filename);
+        await fs.writeFile(filepath, optimizedBuffer);
+        const webPath = type === 'vehicle'
+            ? `/uploads/vehicles/${filename}`
+            : `/uploads/site/${filename}`;
         // Limpar arquivo temporário
         try {
             await fs.unlink(file.filepath);
@@ -207,13 +189,14 @@ async function handlePost(req, res) {
         // Registrar sucesso no rate limiter
         await recordAttempt(uploadIdentifier, true, req);
         // Log da operação
-        await logFileUpload(filename, file.size, file.mimetype || 'unknown', user?.id, req);
+        await logFileUpload(filename, optimizedBuffer.length, file.mimetype || 'unknown', user?.id, req);
         return sendResponse(res, req, {
             success: true,
             message: 'Upload realizado com sucesso',
             filename,
             url: webPath,
-            size: file.size,
+            size: optimizedBuffer.length,
+            originalSize: file.size,
             type: file.mimetype,
         }, 200);
     }
