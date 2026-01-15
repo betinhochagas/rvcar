@@ -1,6 +1,9 @@
 # GitHub Workflows (contém referências legacy)
 .github/
 
+# Documentação Legacy (contém referências PHP antigas)
+docs-legacy/
+
 # Ignorar arquivos PHP antigos
 *.php
 api/*.php
