@@ -57,8 +57,10 @@ export function getUploadPath(subdir?: string): string {
  * Lê arquivo JSON
  */
 export async function readJsonFile<T>(filePath: string, defaultValue?: T): Promise<T> {
+  console.log(`[readJsonFile] Lendo: ${filePath}`);
   try {
     const exists = await fs.access(filePath).then(() => true).catch(() => false);
+    console.log(`[readJsonFile] Arquivo existe: ${exists}`);
     if (!exists) {
       // Se defaultValue foi fornecido, usar ele; senão retornar objeto ou array vazio
       if (defaultValue !== undefined) {
@@ -68,13 +70,15 @@ export async function readJsonFile<T>(filePath: string, defaultValue?: T): Promi
     }
 
     const content = await fs.readFile(filePath, 'utf-8');
+    console.log(`[readJsonFile] Conteúdo lido: ${content.length} bytes`);
     if (!content || content.trim() === '') {
       return defaultValue !== undefined ? defaultValue : {} as T;
     }
     const data = JSON.parse(content);
+    console.log(`[readJsonFile] Parse OK, keys: ${Object.keys(data).length}`);
     return data as T;
   } catch (error) {
-    console.error(`Erro ao ler arquivo ${filePath}:`, error);
+    console.error(`[readJsonFile] ERRO ao ler arquivo ${filePath}:`, error);
     return defaultValue !== undefined ? defaultValue : {} as T;
   }
 }
@@ -89,21 +93,30 @@ export async function writeJsonFile<T>(
 ): Promise<boolean> {
   const lockPath = `${filePath}.lock`;
   
+  console.log(`[writeJsonFile] Iniciando escrita em: ${filePath}`);
+  
   try {
     const dir = path.dirname(filePath);
+    console.log(`[writeJsonFile] Criando diretório: ${dir}`);
     await fs.mkdir(dir, { recursive: true, mode: 0o700 });
 
     await lock(lockPath);
 
     try {
       const json = JSON.stringify(data, null, 2);
+      console.log(`[writeJsonFile] Escrevendo ${json.length} bytes`);
       await fs.writeFile(filePath, json, { encoding: 'utf-8', mode: permissions });
+      
+      // Verificar se foi escrito
+      const written = await fs.readFile(filePath, 'utf-8');
+      console.log(`[writeJsonFile] Verificação: ${written.length} bytes lidos`);
+      
       return true;
     } finally {
       await unlock(lockPath);
     }
   } catch (error) {
-    console.error(`Erro ao escrever arquivo ${filePath}:`, error);
+    console.error(`[writeJsonFile] ERRO ao escrever arquivo ${filePath}:`, error);
     return false;
   }
 }
