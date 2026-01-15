@@ -30,7 +30,7 @@ export default async function handler(req, res) {
             environment: process.env.NODE_ENV || 'development',
             storage: storageStatus,
             env: envInfo,
-            version: '1.0.0',
+            version: '1.0.1', // Updated to track deploy
         }, isHealthy ? 200 : 503);
     }
     catch (error) {

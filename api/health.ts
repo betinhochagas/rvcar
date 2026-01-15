@@ -37,7 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       environment: process.env.NODE_ENV || 'development',
       storage: storageStatus,
       env: envInfo,
-      version: '1.0.0',
+      version: '1.0.1', // Updated to track deploy
     }, isHealthy ? 200 : 503);
   } catch (error) {
     console.error('Health check failed:', error);
