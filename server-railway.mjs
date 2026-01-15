@@ -3,6 +3,9 @@ import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs/promises';
+import { IncomingForm } from 'formidable';
+import sharp from 'sharp';
+import { nanoid } from 'nanoid';
 
 // Handler de erros não capturados
 process.on('uncaughtException', (error) => {
@@ -67,6 +70,7 @@ const ALLOWED_ORIGINS = [
   'https://rvcar.vercel.app',
   'https://www.rvcarlocacoes.com.br',
   'https://rvcarlocacoes.com.br',
+  'https://rvcar-production.up.railway.app',
   'http://localhost:8080',
   'http://localhost:3000',
   'http://localhost:5173',
@@ -370,16 +374,96 @@ app.delete('/api/site-settings/:key', handleSiteSettingByKey);
 app.options('/api/site-settings/:key', handleSiteSettingByKey);
 
 // ============================================================================
-// UPLOAD
+// UPLOAD (handler customizado para formidable funcionar)
 // ============================================================================
+
 app.post('/api/upload', async (req, res) => {
   try {
-    const handler = await loadHandler('upload');
-    const { vercelReq, vercelRes } = createVercelMocks(req, res);
-    await handler(vercelReq, vercelRes);
+    // Verificar autenticação
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: true, message: 'Token de autenticação necessário' });
+    }
+
+    // Parse form data usando req original do Express
+    const form = new IncomingForm({
+      maxFileSize: 5 * 1024 * 1024, // 5MB
+      keepExtensions: true,
+    });
+
+    const { fields, files } = await new Promise((resolve, reject) => {
+      form.parse(req, (err, fields, files) => {
+        if (err) reject(err);
+        else resolve({ fields, files });
+      });
+    });
+
+    const imageFiles = files.image;
+    const file = Array.isArray(imageFiles) ? imageFiles[0] : imageFiles;
+
+    if (!file) {
+      return res.status(400).json({ error: true, message: 'Nenhuma imagem foi enviada' });
+    }
+
+    const typeField = fields.type;
+    const type = (Array.isArray(typeField) ? typeField[0] : typeField) || 'vehicle';
+
+    // Ler arquivo
+    const buffer = await fs.readFile(file.filepath);
+
+    // Validar com sharp
+    let metadata;
+    try {
+      metadata = await sharp(buffer).metadata();
+    } catch {
+      return res.status(400).json({ error: true, message: 'Arquivo não é uma imagem válida' });
+    }
+
+    // Gerar nome único
+    const uniqueId = nanoid(10);
+    const outputFormat = metadata.format === 'png' ? 'png' : 'jpeg';
+    const filename = `${uniqueId}.${outputFormat}`;
+
+    // Otimizar imagem
+    let optimizedBuffer;
+    if (outputFormat === 'png') {
+      optimizedBuffer = await sharp(buffer)
+        .resize(1920, 1080, { fit: 'inside', withoutEnlargement: true })
+        .png({ compressionLevel: 9 })
+        .toBuffer();
+    } else {
+      optimizedBuffer = await sharp(buffer)
+        .resize(1920, 1080, { fit: 'inside', withoutEnlargement: true })
+        .jpeg({ quality: 85 })
+        .toBuffer();
+    }
+
+    // Salvar
+    const uploadDir = type === 'vehicle' 
+      ? join(STORAGE_BASE, 'uploads', 'vehicles')
+      : join(STORAGE_BASE, 'uploads', 'site');
+
+    await fs.mkdir(uploadDir, { recursive: true });
+    const filepath = join(uploadDir, filename);
+    await fs.writeFile(filepath, optimizedBuffer);
+
+    const webPath = type === 'vehicle' 
+      ? `/uploads/vehicles/${filename}`
+      : `/uploads/site/${filename}`;
+
+    // Limpar temp
+    try { await fs.unlink(file.filepath); } catch {}
+
+    return res.status(200).json({
+      success: true,
+      message: 'Upload realizado com sucesso',
+      filename,
+      url: webPath,
+      size: optimizedBuffer.length,
+    });
   } catch (error) {
     console.error('Upload error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: true, message: 'Erro no servidor' });
   }
 });
 
