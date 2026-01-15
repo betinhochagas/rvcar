@@ -6,7 +6,11 @@
   "installCommand": "npm install",
   "rewrites": [
     {
-      "source": "/((?!assets).*)",
+      "source": "/api/:path*",
+      "destination": "https://rvcar-production.up.railway.app/api/:path*"
+    },
+    {
+      "source": "/((?!assets|api).*)",
       "destination": "/index.html"
     }
   ],
