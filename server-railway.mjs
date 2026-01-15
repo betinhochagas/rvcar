@@ -13,6 +13,17 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM recebido. Encerrando graciosamente...');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('🛑 SIGINT recebido. Encerrando graciosamente...');
+  process.exit(0);
+});
+
 console.log('🚀 Iniciando servidor Railway...');
 console.log('   NODE_ENV:', process.env.NODE_ENV);
 console.log('   PORT:', process.env.PORT || 3000);
@@ -141,24 +152,31 @@ const API_DIR = process.env.NODE_ENV === 'production' ? './api-dist' : './api';
 
 async function loadHandler(name) {
   if (!handlers[name]) {
-    const module = await import(`${API_DIR}/${name}.js`);
-    handlers[name] = module.default;
+    console.log(`📦 Carregando handler: ${name}`);
+    try {
+      const module = await import(`${API_DIR}/${name}.js`);
+      handlers[name] = module.default;
+      console.log(`✅ Handler ${name} carregado com sucesso`);
+    } catch (error) {
+      console.error(`❌ Erro ao carregar handler ${name}:`, error);
+      throw error;
+    }
   }
   return handlers[name];
 }
 
 // ============================================================================
-// HEALTH CHECK
+// HEALTH CHECK (simplificado para Railway)
 // ============================================================================
-app.get('/api/health', async (req, res) => {
-  try {
-    const handler = await loadHandler('health');
-    const { vercelReq, vercelRes } = createVercelMocks(req, res);
-    await handler(vercelReq, vercelRes);
-  } catch (error) {
-    console.error('Health check error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+app.get('/api/health', (req, res) => {
+  // Health check simples e rápido para o Railway
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    port: PORT,
+    uptime: process.uptime()
+  });
 });
 
 // ============================================================================
