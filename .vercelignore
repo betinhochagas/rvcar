@@ -1,6 +1,13 @@
 # GitHub Workflows (contém referências legacy)
 .github/
 
+# API Backend (vai rodar no Railway)
+api/
+api-dist/
+server*.mjs
+Procfile
+railway.json
+
 # Documentação Legacy (contém referências PHP antigas)
 docs-legacy/
 

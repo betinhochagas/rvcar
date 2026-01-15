@@ -7,54 +7,13 @@
   "devCommand": "npm run dev",
   "rewrites": [
     {
-      "source": "/api/auth/login",
-      "destination": "/api/auth?action=login"
-    },
-    {
-      "source": "/api/auth/logout",
-      "destination": "/api/auth?action=logout"
-    },
-    {
-      "source": "/api/auth/verify",
-      "destination": "/api/auth?action=verify"
-    },
-    {
-      "source": "/api/auth/change-password",
-      "destination": "/api/auth?action=change-password"
-    },
-    {
-      "source": "/api/vehicles/:id",
-      "destination": "/api/vehicles/[id]"
-    },
-    {
-      "source": "/api/site-settings/:key",
-      "destination": "/api/site-settings/[key]"
-    },
-    {
-      "source": "/((?!api/).*)",
+      "source": "/((?!assets).*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
     {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Credentials",
-          "value": "true"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET,POST,PUT,DELETE,PATCH,OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization, X-Requested-With, Cache-Control, Pragma, X-CSRF-Token, X-Seed-Secret"
-        }
-      ]
-    },
-    {
-      "source": "/uploads/(.*)",
+      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -62,12 +21,8 @@
         }
       ]
     }
-  ],
-  "functions": {
-    "api/**/*.ts": {
-      "memory": 1024,
-      "maxDuration": 10
-    }
+  ]
+}
   },
   "regions": ["gru1"]
 }
