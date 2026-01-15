@@ -128,13 +128,15 @@ const SiteSettings = () => {
       // Atualizar o contexto global para aplicar as mudanças no site
       await refreshConfigs();
       
-      toast.success('Configurações salvas com sucesso! Recarregue a página principal para ver as alterações.', {
-        duration: 5000,
-        action: {
-          label: 'Ver Site',
-          onClick: () => window.open('/', '_blank')
-        }
+      // Forçar reload após salvar para aplicar mudanças
+      toast.success('Configurações salvas! Recarregando página...', {
+        duration: 2000
       });
+      
+      // Aguardar 1 segundo e recarregar a página principal
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       logger.error('Erro ao salvar configurações:', error);
       toast.error('Erro ao salvar configurações');

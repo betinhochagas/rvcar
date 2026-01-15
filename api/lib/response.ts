@@ -1,55 +1,53 @@
-import type { NextRequest } from 'next/server';
-import { getCorsHeaders } from './cors';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { applyCorsHeaders } from './cors';
 
 /**
  * Envia resposta de sucesso com CORS
  */
 export function sendResponse<T>(
+  res: VercelResponse,
+  req: VercelRequest,
   data: T,
-  request: NextRequest,
   statusCode: number = 200
-): Response {
-  return new Response(JSON.stringify(data), {
-    status: statusCode,
-    headers: getCorsHeaders(request),
-  });
+): void {
+  applyCorsHeaders(res, req);
+  res.status(statusCode).json(data);
 }
 
 /**
  * Envia resposta de erro com CORS
  */
 export function sendError(
+  res: VercelResponse,
+  req: VercelRequest,
   message: string,
-  request: NextRequest,
   statusCode: number = 400
-): Response {
-  return new Response(
-    JSON.stringify({
-      error: true,
-      message,
-    }),
-    {
-      status: statusCode,
-      headers: getCorsHeaders(request),
-    }
-  );
+): void {
+  applyCorsHeaders(res, req);
+  res.status(statusCode).json({
+    error: true,
+    message,
+  });
 }
 
 /**
  * Valida Content-Type para métodos que requerem JSON
  */
-export function validateContentType(request: NextRequest): boolean {
-  const contentType = request.headers.get('content-type') || '';
+export function validateContentType(req: VercelRequest): boolean {
+  const contentType = (req.headers['content-type'] as string) || '';
   return contentType.includes('application/json');
 }
 
 /**
- * Parse body JSON com tratamento de erros
+ * Obtém body JSON da requisição (já parseado pelo Vercel)
  */
-export async function parseJsonBody<T>(request: NextRequest): Promise<T | null> {
+export function getJsonBody<T>(req: VercelRequest): T | null {
   try {
-    const body = await request.json();
-    return body as T;
+    // Vercel já faz parse automático do body JSON
+    if (req.body && typeof req.body === 'object') {
+      return req.body as T;
+    }
+    return null;
   } catch {
     return null;
   }

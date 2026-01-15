@@ -70,7 +70,7 @@ export const login = async (username: string, password: string): Promise<LoginRe
   const data = await fetchWithRetry<LoginResponse>(`${AUTH_API_BASE}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ action: 'login', username, password }),
   }, {
     retries: 3,
     backoff: 1000,

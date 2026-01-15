@@ -1,14 +1,14 @@
-import type { NextRequest } from 'next/server';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Type definition for headers
-type HeadersInit = Record<string, string>;
+type CorsHeaders = Record<string, string>;
 
 /**
  * Configura headers CORS baseado no ambiente
  */
-export function getCorsHeaders(request: NextRequest): HeadersInit {
-  const origin = request.headers.get('origin') || '';
-  const host = request.headers.get('host') || '';
+export function getCorsHeaders(req: VercelRequest): CorsHeaders {
+  const origin = (req.headers.origin as string) || '';
+  const host = req.headers.host || '';
   
   // Detectar ambiente de produção
   const isProduction = 
@@ -17,16 +17,16 @@ export function getCorsHeaders(request: NextRequest): HeadersInit {
     !host.match(/192\.168\.\d+\.\d+/) &&
     !host.match(/10\.\d+\.\d+\.\d+/);
 
-  const headers: HeadersInit = {
+  const headers: CorsHeaders = {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, Cache-Control, Pragma, X-CSRF-Token',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, Cache-Control, Pragma, X-CSRF-Token, X-Seed-Secret',
     'Access-Control-Max-Age': '86400',
   };
 
   if (isProduction) {
     // Produção: apenas permitir origem do próprio domínio
-    const protocol = request.headers.get('x-forwarded-proto') || 'https';
+    const protocol = (req.headers['x-forwarded-proto'] as string) || 'https';
     const allowedOrigins = [
       `${protocol}://${host}`,
       `https://${host}`,
@@ -55,11 +55,26 @@ export function getCorsHeaders(request: NextRequest): HeadersInit {
 }
 
 /**
+ * Aplica headers CORS na resposta
+ */
+export function applyCorsHeaders(res: VercelResponse, req: VercelRequest): void {
+  const headers = getCorsHeaders(req);
+  for (const [key, value] of Object.entries(headers)) {
+    res.setHeader(key, value);
+  }
+}
+
+/**
  * Handler para requisições OPTIONS (preflight)
  */
-export function handleOptions(request: NextRequest): Response {
-  return new Response(null, {
-    status: 200,
-    headers: getCorsHeaders(request),
-  });
+export function handleOptions(req: VercelRequest, res: VercelResponse): void {
+  applyCorsHeaders(res, req);
+  res.status(204).end();
+}
+
+/**
+ * Verifica se a requisição é OPTIONS
+ */
+export function isOptionsRequest(req: VercelRequest): boolean {
+  return req.method === 'OPTIONS';
 }

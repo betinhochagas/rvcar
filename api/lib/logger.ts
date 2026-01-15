@@ -1,10 +1,19 @@
-import fs from 'fs/promises';
-import { getLogPath } from './file-ops';
+import type { VercelRequest } from '@vercel/node';
 
 type Severity = 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL';
 
 interface SecurityEventDetails {
   [key: string]: unknown;
+}
+
+/**
+ * Obtém header de forma segura do VercelRequest
+ */
+function getHeader(req: VercelRequest | undefined, name: string): string {
+  if (!req) return 'unknown';
+  const value = req.headers[name.toLowerCase()];
+  if (Array.isArray(value)) return value[0] || 'unknown';
+  return value || 'unknown';
 }
 
 /**
@@ -14,34 +23,28 @@ export async function logSecurityEvent(
   event: string,
   severity: Severity = 'INFO',
   details: SecurityEventDetails = {},
-  request?: Request
+  req?: VercelRequest
 ): Promise<void> {
   try {
-    const logPath = getLogPath('security.log');
-    
     // Coletar informações do contexto
     const timestamp = new Date().toISOString();
-    const ip = request?.headers.get('x-forwarded-for') || 
-               request?.headers.get('x-real-ip') || 
-               'unknown';
-    const userAgent = request?.headers.get('user-agent') || 'unknown';
-    const method = request?.method || 'unknown';
-    const url = request?.url || 'unknown';
+    const ip = getHeader(req, 'x-forwarded-for') || getHeader(req, 'x-real-ip');
+    const userAgent = getHeader(req, 'user-agent');
+    const method = req?.method || 'unknown';
+    const url = req?.url || 'unknown';
 
     // Montar mensagem de log
     const logEntry = `[${timestamp}] [${severity}] ${event} | IP: ${ip} | Method: ${method} | URL: ${url} | UA: ${userAgent.substring(0, 100)}${
       Object.keys(details).length > 0 ? ' | Details: ' + JSON.stringify(details) : ''
-    }\n`;
+    }`;
 
-    // Escrever no arquivo (append)
-    await fs.appendFile(logPath, logEntry, { encoding: 'utf-8' });
-
-    // Garantir permissões restritas
-    await fs.chmod(logPath, 0o600).catch(() => {});
-
-    // Em produção, também enviar para console em casos críticos
+    // Em serverless, usar console.log (Vercel captura automaticamente)
     if (severity === 'CRITICAL' || severity === 'ERROR') {
-      console.error(`SECURITY [${severity}]: ${event} - IP: ${ip}`);
+      console.error(`SECURITY [${severity}]: ${logEntry}`);
+    } else if (severity === 'WARNING') {
+      console.warn(`SECURITY [${severity}]: ${logEntry}`);
+    } else {
+      console.log(`SECURITY [${severity}]: ${logEntry}`);
     }
   } catch (error) {
     // Falha ao logar não deve quebrar a aplicação
@@ -56,7 +59,7 @@ export async function logLoginAttempt(
   username: string,
   success: boolean,
   reason: string = '',
-  request?: Request
+  req?: VercelRequest
 ): Promise<void> {
   const event = success ? 'Login bem-sucedido' : 'Tentativa de login falhou';
   const severity = success ? 'INFO' : 'WARNING';
@@ -65,7 +68,7 @@ export async function logLoginAttempt(
     username,
     success,
     reason,
-  }, request);
+  }, req);
 }
 
 /**
@@ -74,12 +77,12 @@ export async function logLoginAttempt(
 export async function logPasswordChange(
   userId: number,
   username: string,
-  request?: Request
+  req?: VercelRequest
 ): Promise<void> {
   await logSecurityEvent('Senha alterada', 'INFO', {
     user_id: userId,
     username,
-  }, request);
+  }, req);
 }
 
 /**
@@ -90,7 +93,7 @@ export async function logCrudOperation(
   operation: string,
   entityId?: number | string,
   userId?: number,
-  request?: Request
+  req?: VercelRequest
 ): Promise<void> {
   const event = `${operation.toUpperCase()} ${entity}`;
 
@@ -99,7 +102,7 @@ export async function logCrudOperation(
     operation,
     entity_id: entityId,
     user_id: userId,
-  }, request);
+  }, req);
 }
 
 /**
@@ -110,14 +113,14 @@ export async function logFileUpload(
   filesize: number,
   mimetype: string,
   userId?: number,
-  request?: Request
+  req?: VercelRequest
 ): Promise<void> {
   await logSecurityEvent('Upload de arquivo', 'INFO', {
     filename,
     filesize,
     mimetype,
     user_id: userId,
-  }, request);
+  }, req);
 }
 
 /**
@@ -126,12 +129,12 @@ export async function logFileUpload(
 export async function logRateLimitBlock(
   identifier: string,
   attempts: number,
-  request?: Request
+  req?: VercelRequest
 ): Promise<void> {
   await logSecurityEvent('Rate limit atingido', 'WARNING', {
     identifier: identifier.substring(0, 16), // Apenas parte do hash
     attempts,
-  }, request);
+  }, req);
 }
 
 /**
@@ -139,11 +142,11 @@ export async function logRateLimitBlock(
  */
 export async function logCsrfViolation(
   userId?: number,
-  request?: Request
+  req?: VercelRequest
 ): Promise<void> {
   await logSecurityEvent('Token CSRF inválido', 'WARNING', {
     user_id: userId,
-  }, request);
+  }, req);
 }
 
 /**
@@ -152,12 +155,12 @@ export async function logCsrfViolation(
 export async function logUnauthorizedAccess(
   resource: string,
   userId?: number,
-  request?: Request
+  req?: VercelRequest
 ): Promise<void> {
   await logSecurityEvent('Acesso não autorizado', 'WARNING', {
     resource,
     user_id: userId,
-  }, request);
+  }, req);
 }
 
 /**
@@ -166,10 +169,10 @@ export async function logUnauthorizedAccess(
 export async function logValidationError(
   field: string,
   value: string,
-  request?: Request
+  req?: VercelRequest
 ): Promise<void> {
   await logSecurityEvent('Erro de validação', 'INFO', {
     field,
     value: value.substring(0, 50), // Apenas início do valor
-  }, request);
+  }, req);
 }

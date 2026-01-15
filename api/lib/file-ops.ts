@@ -1,5 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { getData, setData, STORAGE_KEYS } from './storage';
+
+// Detectar ambiente
+const isVercel = process.env.VERCEL === '1';
+const hasKV = !!process.env.KV_REST_API_URL;
 
 // Lockfile alternativo - implementação simplificada
 const locks = new Map<string, Promise<void>>();
@@ -20,14 +25,39 @@ async function unlock(_lockPath: string): Promise<void> {
 }
 
 /**
- * Lê arquivo JSON com lock compartilhado (múltiplas leituras simultâneas)
+ * Converte caminho de arquivo para chave de storage
+ */
+function filePathToStorageKey(filePath: string): string {
+  const basename = path.basename(filePath, '.json');
+  
+  // Mapear nomes de arquivo para chaves de storage
+  const keyMap: Record<string, string> = {
+    'vehicles': STORAGE_KEYS.VEHICLES,
+    'site-settings': STORAGE_KEYS.SITE_SETTINGS,
+    'admin-users': STORAGE_KEYS.ADMIN_USERS,
+    'admin-tokens': STORAGE_KEYS.ADMIN_TOKENS,
+    'rate-limits': STORAGE_KEYS.RATE_LIMITS,
+  };
+
+  return keyMap[basename] || basename;
+}
+
+/**
+ * Lê arquivo JSON - usa KV em produção, arquivo local em dev
  */
 export async function readJsonFile<T>(filePath: string): Promise<T> {
+  // Em produção com KV: usar storage abstrato
+  if (isVercel && hasKV) {
+    const key = filePathToStorageKey(filePath);
+    const defaultValue = [] as unknown as T;
+    return await getData<T>(key, defaultValue);
+  }
+
+  // Em desenvolvimento ou sem KV: usar arquivo local
   try {
-    // Tentar ler sem lock primeiro (otimização)
     const exists = await fs.access(filePath).then(() => true).catch(() => false);
     if (!exists) {
-      return (Array.isArray({}) ? [] : {}) as T;
+      return [] as unknown as T;
     }
 
     const content = await fs.readFile(filePath, 'utf-8');
@@ -35,38 +65,38 @@ export async function readJsonFile<T>(filePath: string): Promise<T> {
     return data as T;
   } catch (error) {
     console.error(`Erro ao ler arquivo ${filePath}:`, error);
-    return (Array.isArray({}) ? [] : {}) as T;
+    return [] as unknown as T;
   }
 }
 
 /**
- * Escreve arquivo JSON com lock exclusivo (apenas uma escrita por vez)
+ * Escreve arquivo JSON - usa KV em produção, arquivo local em dev
  */
 export async function writeJsonFile<T>(
   filePath: string,
   data: T,
   permissions: number = 0o600
 ): Promise<boolean> {
+  // Em produção com KV: usar storage abstrato
+  if (isVercel && hasKV) {
+    const key = filePathToStorageKey(filePath);
+    return await setData(key, data);
+  }
+
+  // Em desenvolvimento ou sem KV: usar arquivo local
   const lockPath = `${filePath}.lock`;
   
   try {
-    // Criar diretório se não existir
     const dir = path.dirname(filePath);
     await fs.mkdir(dir, { recursive: true, mode: 0o700 });
 
-    // Obter lock exclusivo
     await lock(lockPath);
 
     try {
-      // Serializar dados
       const json = JSON.stringify(data, null, 2);
-
-      // Escrever arquivo
       await fs.writeFile(filePath, json, { encoding: 'utf-8', mode: permissions });
-
       return true;
     } finally {
-      // Sempre liberar lock
       await unlock(lockPath);
     }
   } catch (error) {
@@ -77,26 +107,38 @@ export async function writeJsonFile<T>(
 
 /**
  * Atualiza arquivo JSON de forma atômica
- * @param filePath Caminho do arquivo
- * @param callback Função que recebe dados atuais e retorna resultado
  */
 export async function updateJsonFile<T, R>(
   filePath: string,
   callback: (data: T) => R | Promise<R>,
   permissions: number = 0o600
 ): Promise<R | null> {
+  // Em produção com KV: usar storage abstrato
+  if (isVercel && hasKV) {
+    const key = filePathToStorageKey(filePath);
+    const defaultValue = [] as unknown as T;
+    
+    try {
+      const current = await getData<T>(key, defaultValue);
+      const result = await callback(current);
+      await setData(key, current);
+      return result;
+    } catch (error) {
+      console.error(`Erro ao atualizar KV (${key}):`, error);
+      return null;
+    }
+  }
+
+  // Em desenvolvimento ou sem KV: usar arquivo local
   const lockPath = `${filePath}.lock`;
   
   try {
-    // Criar diretório se não existir
     const dir = path.dirname(filePath);
     await fs.mkdir(dir, { recursive: true, mode: 0o700 });
 
-    // Obter lock exclusivo durante toda a operação
     await lock(lockPath);
 
     try {
-      // Ler dados atuais
       let data: T;
       const exists = await fs.access(filePath).then(() => true).catch(() => false);
       

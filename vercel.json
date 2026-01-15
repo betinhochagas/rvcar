@@ -7,11 +7,15 @@
   "devCommand": "npm run dev",
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "source": "/api/vehicles/:id",
+      "destination": "/api/vehicles/[id]"
     },
     {
-      "source": "/(.*)",
+      "source": "/api/site-settings/:key",
+      "destination": "/api/site-settings/[key]"
+    },
+    {
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ],
@@ -29,7 +33,7 @@
         },
         {
           "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization, X-Requested-With, Cache-Control, Pragma, X-CSRF-Token"
+          "value": "Content-Type, Authorization, X-Requested-With, Cache-Control, Pragma, X-CSRF-Token, X-Seed-Secret"
         }
       ]
     },
@@ -48,9 +52,6 @@
       "runtime": "nodejs20.x",
       "memory": 1024,
       "maxDuration": 10
-    },
-    "api/**/*.js": {
-      "runtime": "nodejs20.x"
     }
   },
   "regions": ["gru1"]

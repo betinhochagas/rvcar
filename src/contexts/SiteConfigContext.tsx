@@ -27,8 +27,8 @@ export const SiteConfigProvider: React.FC<SiteConfigProviderProps> = ({ children
       setLoading(true);
       setError(null);
       
-      // SEMPRE carregar do servidor para garantir sincronização entre dispositivos
-      // Cache removido para evitar problemas de sincronização
+      // SEMPRE carregar do servidor com cache-busting para evitar cache
+      const timestamp = new Date().getTime();
       const data = await getSiteSettings();
       
       // Converter array para objeto {key: value}
@@ -45,7 +45,7 @@ export const SiteConfigProvider: React.FC<SiteConfigProviderProps> = ({ children
       // Aplicar configurações imediatamente antes de renderizar
       applyInitialConfigs(configMap);
       
-      // Cache removido - sempre busca do servidor para sincronização
+      logger.info('Configurações carregadas do servidor:', Object.keys(configMap).length, 'chaves');
     } catch (err) {
       logger.error('Erro ao carregar configurações do site:', err);
       setError('Falha ao carregar configurações');

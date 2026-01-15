@@ -163,7 +163,7 @@ const AdminDashboard = () => {
 
     const vehicleData = {
       name: formData.name,
-      price: formData.price,
+      price: parseFloat(formData.price),
       image: formData.image || '/placeholder.svg',
       features: formData.features.split(',').map(f => f.trim()).filter(f => f),
       available: formData.available,
@@ -246,9 +246,6 @@ const AdminDashboard = () => {
             <div className="flex items-center space-x-2">
               <Button variant="outline" onClick={() => navigate('/admin/site-settings')}>
                 Configurações do Site
-              </Button>
-              <Button variant="outline" onClick={() => navigate('/admin/page-sections')}>
-                Gerenciar Seções
               </Button>
               <Button variant="outline" onClick={() => navigate('/')}>
                 <Home className="h-4 w-4 mr-2" />

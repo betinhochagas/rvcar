@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import type { VercelRequest } from '@vercel/node';
 import type { RateLimits, RateLimitResult } from '../types/security';
 import { readJsonFile, writeJsonFile, getDataPath } from './file-ops';
 import { logRateLimitBlock } from './logger';
@@ -62,7 +63,7 @@ export async function checkRateLimit(
 export async function recordAttempt(
   identifier: string,
   success: boolean = false,
-  request?: Request
+  req?: VercelRequest
 ): Promise<void> {
   const rateLimits = await readJsonFile<RateLimits>(RATE_LIMIT_FILE);
   const now = Math.floor(Date.now() / 1000);
@@ -86,7 +87,7 @@ export async function recordAttempt(
 
       // Se atingiu o limite, logar
       if (rateLimits[identifier].count >= MAX_ATTEMPTS) {
-        await logRateLimitBlock(identifier, rateLimits[identifier].count, request);
+        await logRateLimitBlock(identifier, rateLimits[identifier].count, req);
       }
     }
   }
@@ -98,11 +99,11 @@ export async function recordAttempt(
 /**
  * Obtém identificador único para rate limit (IP + User-Agent)
  */
-export function getRateLimitIdentifier(request: Request, username: string = ''): string {
-  const ip = request.headers.get('x-forwarded-for') ||
-             request.headers.get('x-real-ip') ||
+export function getRateLimitIdentifier(req: VercelRequest, username: string = ''): string {
+  const ip = (req.headers['x-forwarded-for'] as string) ||
+             (req.headers['x-real-ip'] as string) ||
              'unknown';
-  const userAgent = request.headers.get('user-agent') || 'unknown';
+  const userAgent = (req.headers['user-agent'] as string) || 'unknown';
 
   // Combinar IP, user agent e username para criar identificador único
   let identifier = ip + '|' + crypto.createHash('md5').update(userAgent).digest('hex').substring(0, 8);
@@ -116,6 +117,8 @@ export function getRateLimitIdentifier(request: Request, username: string = ''):
 
 /**
  * Limpa rate limits antigos (manutenção)
+ * Nota: Em ambiente serverless, esta função é chamada dentro de checkRateLimit
+ * para limpeza inline, não como processo em background.
  */
 export async function cleanOldRateLimits(): Promise<void> {
   const rateLimits = await readJsonFile<RateLimits>(RATE_LIMIT_FILE);
@@ -133,9 +136,4 @@ export async function cleanOldRateLimits(): Promise<void> {
   if (cleaned) {
     await writeJsonFile(RATE_LIMIT_FILE, rateLimits, 0o600);
   }
-}
-
-// Executar limpeza ocasionalmente (10% de chance)
-if (Math.random() < 0.1) {
-  cleanOldRateLimits().catch(console.error);
 }

@@ -40,7 +40,6 @@ export const booleanSchema = z.boolean().or(
  * Schema de Login
  */
 export const loginSchema = z.object({
-  action: z.literal('login'),
   username: z.string().min(3, 'Usuário deve ter pelo menos 3 caracteres'),
   password: z.string().min(1, 'Senha é obrigatória'),
 });
@@ -49,7 +48,6 @@ export const loginSchema = z.object({
  * Schema de Verificação de Token
  */
 export const verifyTokenSchema = z.object({
-  action: z.literal('verify_token'),
   token: z.string().length(64, 'Token inválido'),
 });
 
@@ -57,7 +55,6 @@ export const verifyTokenSchema = z.object({
  * Schema de Alteração de Senha
  */
 export const changePasswordSchema = z.object({
-  action: z.literal('change_password'),
   token: z.string().length(64, 'Token inválido'),
   current_password: z.string().min(1, 'Senha atual é obrigatória'),
   new_password: z
@@ -96,7 +93,7 @@ export const updateVehicleSchema = z.object({
 export const siteSettingSchema = z.object({
   config_key: z.string().min(1, 'Chave é obrigatória'),
   config_value: z.string(),
-  config_type: z.enum(['text', 'number', 'boolean', 'url', 'email', 'tel']).optional().default('text'),
+  config_type: z.enum(['text', 'number', 'boolean', 'url', 'email', 'tel', 'color', 'image']).optional().default('text'),
   description: z.string().optional().default(''),
 });
 

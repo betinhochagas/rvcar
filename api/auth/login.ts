@@ -1,48 +1,64 @@
-import { NextRequest } from 'next/server';
-import { handleOptions } from '../../lib/cors';
-import { sendResponse, sendError, parseJsonBody } from '../../lib/response';
-import { loginSchema, formatZodError } from '../../lib/validator';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { handleOptions, isOptionsRequest } from '../lib/cors';
+import { sendResponse, sendError, getJsonBody } from '../lib/response';
+import { loginSchema, formatZodError } from '../lib/validator';
 import { 
   findUserByUsername, 
   verifyPassword, 
   createToken 
-} from '../../lib/auth';
+} from '../lib/auth';
 import { 
   checkRateLimit, 
   recordAttempt, 
   getRateLimitIdentifier 
-} from '../../lib/rate-limiter';
-import { logLoginAttempt } from '../../lib/logger';
+} from '../lib/rate-limiter';
+import { logLoginAttempt } from '../lib/logger';
+
+/**
+ * Handler principal para /api/auth/login
+ */
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // CORS preflight
+  if (isOptionsRequest(req)) {
+    return handleOptions(req, res);
+  }
+
+  if (req.method !== 'POST') {
+    return sendError(res, req, 'Método não permitido', 405);
+  }
+
+  return handlePost(req, res);
+}
 
 /**
  * POST /api/auth/login
  * Autentica usuário e retorna token
  */
-export async function POST(request: NextRequest) {
+async function handlePost(req: VercelRequest, res: VercelResponse) {
   try {
     // Parse do body
-    const body = await parseJsonBody(request);
+    const body = getJsonBody(req);
     
     if (!body) {
-      return sendError('Dados inválidos', request, 400);
+      return sendError(res, req, 'Dados inválidos', 400);
     }
 
     // Validar com Zod
     const validation = loginSchema.safeParse(body);
     if (!validation.success) {
-      return sendError(formatZodError(validation.error), request, 400);
+      return sendError(res, req, formatZodError(validation.error), 400);
     }
 
     const { username, password } = validation.data;
 
     // Verificar rate limiting
-    const rateLimitId = getRateLimitIdentifier(request, username);
+    const rateLimitId = getRateLimitIdentifier(req, username);
     const rateCheck = await checkRateLimit(rateLimitId);
 
     if (!rateCheck.allowed) {
       return sendError(
+        res, req,
         `Muitas tentativas de login. Tente novamente em ${rateCheck.remaining_minutes} minuto(s).`,
-        request,
         429
       );
     }
@@ -52,10 +68,10 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       // Registrar tentativa falha
-      await recordAttempt(rateLimitId, false, request);
-      await logLoginAttempt(username, false, 'Usuário não encontrado', request);
+      await recordAttempt(rateLimitId, false, req);
+      await logLoginAttempt(username, false, 'Usuário não encontrado', req);
       
-      return sendError('Usuário ou senha incorretos', request, 401);
+      return sendError(res, req, 'Usuário ou senha incorretos', 401);
     }
 
     // Verificar senha
@@ -63,15 +79,15 @@ export async function POST(request: NextRequest) {
 
     if (!passwordValid) {
       // Registrar tentativa falha
-      await recordAttempt(rateLimitId, false, request);
-      await logLoginAttempt(username, false, 'Senha incorreta', request);
+      await recordAttempt(rateLimitId, false, req);
+      await logLoginAttempt(username, false, 'Senha incorreta', req);
       
-      return sendError('Usuário ou senha incorretos', request, 401);
+      return sendError(res, req, 'Usuário ou senha incorretos', 401);
     }
 
     // Login bem-sucedido: limpar rate limit
-    await recordAttempt(rateLimitId, true, request);
-    await logLoginAttempt(username, true, '', request);
+    await recordAttempt(rateLimitId, true, req);
+    await logLoginAttempt(username, true, '', req);
 
     // Gerar token
     const token = await createToken(user.id);
@@ -81,6 +97,7 @@ export async function POST(request: NextRequest) {
 
     // Retornar dados do usuário e token
     return sendResponse(
+      res, req,
       {
         success: true,
         token: token.token,
@@ -92,19 +109,10 @@ export async function POST(request: NextRequest) {
         },
         expires_at: token.expires_at,
       },
-      request,
       200
     );
   } catch (error) {
     console.error('Erro no login:', error);
-    return sendError('Erro no servidor', request, 500);
+    return sendError(res, req, 'Erro no servidor', 500);
   }
-}
-
-/**
- * OPTIONS /api/auth/login
- * Preflight CORS
- */
-export async function OPTIONS(request: NextRequest) {
-  return handleOptions(request);
 }

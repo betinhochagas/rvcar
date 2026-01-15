@@ -2,7 +2,7 @@
 export interface SiteSetting {
   config_key: string;
   config_value: string;
-  config_type: 'text' | 'number' | 'boolean' | 'url' | 'email' | 'tel';
+  config_type: 'text' | 'number' | 'boolean' | 'url' | 'email' | 'tel' | 'color' | 'image';
   description: string;
 }
 
