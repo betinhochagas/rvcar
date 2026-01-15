@@ -5,6 +5,7 @@ import { useSiteConfig } from "@/contexts/SiteConfigContext";
 import { getVehicles } from "@/lib/vehicleManager";
 import { logger } from "@/lib/logger";
 import heroBg from "@/assets/hero-bg.jpg";
+import heroBgMobile from "@/assets/hero-bg-mobile.jpg";
 import ConsultantModal from "./ConsultantModal";
 
 const Hero = () => {
@@ -46,16 +47,20 @@ const Hero = () => {
     <section id="home" className="relative min-h-screen flex items-center overflow-hidden pt-16">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
-        <img
-          src={heroBg}
-          alt={`${siteName} - Locação de Veículos`}
-          className="w-full h-full object-cover"
-          loading="eager"
-          fetchPriority="high"
-          decoding="async"
-          width={1920}
-          height={1080}
-        />
+        <picture>
+          <source media="(max-width: 768px)" srcSet={heroBgMobile} />
+          <source media="(min-width: 769px)" srcSet={heroBg} />
+          <img
+            src={heroBg}
+            alt={`${siteName} - Locação de Veículos`}
+            className="w-full h-full object-cover"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            width={1920}
+            height={1080}
+          />
+        </picture>
         <div className="absolute inset-0 bg-gradient-to-r from-dark/90 via-dark/70 to-dark/50" />
       </div>
 
