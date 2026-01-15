@@ -10,24 +10,45 @@ export async function readUsers() {
     const users = await readJsonFile(USERS_FILE);
     // Se não existir usuário, criar admin padrão
     if (!users || users.length === 0) {
-        const randomPassword = crypto.randomBytes(8).toString('hex'); // 16 caracteres
-        const hashedPassword = await bcrypt.hash(randomPassword, 10);
+        // Usar ADMIN_PASSWORD da variável de ambiente ou gerar aleatória
+        const adminPassword = process.env.ADMIN_PASSWORD || crypto.randomBytes(8).toString('hex');
+        const hashedPassword = await bcrypt.hash(adminPassword, 10);
         const defaultUser = {
             id: 1,
             username: 'admin',
             password: hashedPassword,
             name: 'Administrador',
-            must_change_password: true,
+            must_change_password: !process.env.ADMIN_PASSWORD, // Só exige troca se for senha gerada
             created_at: new Date().toISOString(),
         };
         await writeUsers([defaultUser]);
-        // Log da senha temporária
+        // Log da senha (apenas se foi gerada automaticamente)
         console.log('=== ATENÇÃO: Usuário admin criado ===');
         console.log('Username: admin');
-        console.log('Senha temporária:', randomPassword);
-        console.log('IMPORTANTE: Troque a senha no primeiro login!');
+        if (process.env.ADMIN_PASSWORD) {
+            console.log('Senha: definida via ADMIN_PASSWORD');
+        }
+        else {
+            console.log('Senha temporária:', adminPassword);
+            console.log('IMPORTANTE: Troque a senha no primeiro login!');
+        }
         console.log('=====================================');
         return [defaultUser];
+    }
+    // Se ADMIN_PASSWORD está definida, verificar se precisa atualizar a senha
+    if (process.env.ADMIN_PASSWORD && users.length > 0) {
+        const admin = users.find(u => u.username === 'admin');
+        if (admin) {
+            // Verificar se a senha atual é diferente da variável de ambiente
+            const passwordMatches = await bcrypt.compare(process.env.ADMIN_PASSWORD, admin.password);
+            if (!passwordMatches) {
+                // Atualizar senha do admin com a da variável de ambiente
+                admin.password = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
+                admin.must_change_password = false;
+                await writeUsers(users);
+                console.log('🔐 Senha do admin atualizada via ADMIN_PASSWORD');
+            }
+        }
     }
     return users;
 }
