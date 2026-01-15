@@ -4,6 +4,19 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs/promises';
 
+// Handler de erros não capturados
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+console.log('🚀 Iniciando servidor Railway...');
+console.log('   NODE_ENV:', process.env.NODE_ENV);
+console.log('   PORT:', process.env.PORT || 3000);
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -360,15 +373,24 @@ app.options('/api/upload', (req, res) => {
 // FRONTEND (servir arquivos estáticos em produção)
 // ============================================================================
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(join(__dirname, 'dist')));
+  const distPath = join(__dirname, 'dist');
   
-  // SPA fallback - NÃO deve capturar rotas /api
-  app.get('/{*splat}', (req, res, next) => {
-    // Se for rota de API, não serve o index.html
-    if (req.originalUrl.startsWith('/api')) {
-      return res.status(404).json({ error: 'API endpoint not found' });
-    }
-    res.sendFile(join(__dirname, 'dist', 'index.html'));
+  // Verificar se a pasta dist existe
+  fs.access(distPath).then(() => {
+    console.log('📂 Pasta dist encontrada em:', distPath);
+    app.use(express.static(distPath));
+    
+    // SPA fallback - NÃO deve capturar rotas /api
+    app.get('/{*splat}', (req, res, next) => {
+      // Se for rota de API, não serve o index.html
+      if (req.originalUrl.startsWith('/api')) {
+        return res.status(404).json({ error: 'API endpoint not found' });
+      }
+      res.sendFile(join(distPath, 'index.html'));
+    });
+  }).catch(() => {
+    console.log('⚠️ Pasta dist não encontrada em:', distPath);
+    console.log('   O frontend não será servido. Apenas a API estará disponível.');
   });
 }
 
