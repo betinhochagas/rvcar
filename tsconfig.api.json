@@ -1,23 +1,19 @@
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["ES2020"],
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
     "noImplicitAny": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/api/*": ["./api/*"]
-    },
-    "outDir": "./dist/api",
-    "rootDir": "."
+    "declaration": false,
+    "outDir": "./api-dist",
+    "rootDir": "./api"
   },
-  "include": ["api/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["api/**/*.ts"],
+  "exclude": ["node_modules", "dist", "api/**/*.sql"]
 }
