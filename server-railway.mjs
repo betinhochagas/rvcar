@@ -323,8 +323,8 @@ app.options('/api/upload', (req, res) => {
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(join(__dirname, 'dist')));
   
-  // SPA fallback
-  app.get('*', (req, res) => {
+  // SPA fallback (Express 5.x syntax)
+  app.get('/{*splat}', (req, res) => {
     res.sendFile(join(__dirname, 'dist', 'index.html'));
   });
 }
