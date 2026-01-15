@@ -10,6 +10,11 @@ import path from 'path';
 // Lock simples em memória
 const locks = new Map<string, Promise<void>>();
 
+// Caminho base para storage (em produção usa volume persistente)
+const STORAGE_BASE = process.env.NODE_ENV === 'production' 
+  ? '/app/storage' 
+  : process.cwd();
+
 async function lock(lockPath: string): Promise<void> {
   while (locks.has(lockPath)) {
     await locks.get(lockPath);
@@ -36,7 +41,7 @@ async function unlock(lockPath: string): Promise<void> {
  * Obtém caminho base para dados
  */
 export function getDataPath(filename?: string): string {
-  const dataDir = path.join(process.cwd(), 'data');
+  const dataDir = path.join(STORAGE_BASE, 'data');
   return filename ? path.join(dataDir, filename) : dataDir;
 }
 
@@ -44,7 +49,7 @@ export function getDataPath(filename?: string): string {
  * Obtém caminho base para uploads
  */
 export function getUploadPath(subdir?: string): string {
-  const uploadDir = path.join(process.cwd(), 'uploads');
+  const uploadDir = path.join(STORAGE_BASE, 'uploads');
   return subdir ? path.join(uploadDir, subdir) : uploadDir;
 }
 

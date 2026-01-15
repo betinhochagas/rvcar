@@ -7,12 +7,17 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+// Caminho base para storage (em produção usa volume persistente)
+const STORAGE_BASE = process.env.NODE_ENV === 'production' 
+  ? '/app/storage' 
+  : process.cwd();
+
 /**
  * Obtém caminho local do arquivo de dados
  */
 function getLocalPath(key: string): string {
   const filename = `${key.replace(/[^a-zA-Z0-9-_]/g, '-')}.json`;
-  return path.join(process.cwd(), 'data', filename);
+  return path.join(STORAGE_BASE, 'data', filename);
 }
 
 /**
