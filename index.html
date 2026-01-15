@@ -52,16 +52,16 @@
         // Detectar ambiente e definir URL da API
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
           // Acessando via localhost
-          apiUrl = 'http://localhost:3000/api/site-settings.php';
+          apiUrl = 'http://localhost:3000/api/site-settings';
         } else if (hostname.match(/^(192\.168\.|10\.)/)) {
           // Acessando via IP da rede local - usar o mesmo IP
-          apiUrl = `http://${hostname}:3000/api/site-settings.php`;
+          apiUrl = `http://${hostname}:3000/api/site-settings`;
         } else if (window.location.protocol === 'https:') {
           // Produção (HTTPS) - usar URL relativa
-          apiUrl = '/api/site-settings.php';
+          apiUrl = '/api/site-settings';
         } else {
           // Fallback para localhost
-          apiUrl = 'http://localhost:3000/api/site-settings.php';
+          apiUrl = 'http://localhost:3000/api/site-settings';
         }
         
         console.log('[index.html] API URL:', apiUrl);

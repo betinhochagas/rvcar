@@ -6,7 +6,7 @@ import { fetchWithRetry } from './fetchWithRetry';
 // Detectar automaticamente a URL base do ambiente
 const getApiBaseUrl = (): string => {
   if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL.replace(/\/[^/]+\.php$/, '');
+    return import.meta.env.VITE_API_URL;
   }
   
   if (import.meta.env.PROD) {
@@ -190,8 +190,8 @@ export async function saveBulkSettings(configs: SiteConfigForm[]): Promise<SiteC
 export async function getPageSections(activeOnly = false): Promise<PageSection[]> {
   try {
     const url = activeOnly 
-      ? `${API_BASE_URL}/page-sections.php?active=true`
-      : `${API_BASE_URL}/page-sections.php`;
+      ? `${API_BASE_URL}/page-sections?active=true`
+      : `${API_BASE_URL}/page-sections`;
     
     const response = await fetch(url);
     
@@ -212,7 +212,7 @@ export async function getPageSections(activeOnly = false): Promise<PageSection[]
  */
 export async function getPageSection(id: number): Promise<PageSection> {
   try {
-    const response = await fetch(`${API_BASE_URL}/page-sections.php?id=${id}`);
+    const response = await fetch(`${API_BASE_URL}/page-sections?id=${id}`);
     
     if (!response.ok) {
       throw new Error(`Erro ao buscar seção: ${response.statusText}`);
@@ -231,7 +231,7 @@ export async function getPageSection(id: number): Promise<PageSection> {
  */
 export async function getPageSectionByKey(key: string): Promise<PageSection> {
   try {
-    const response = await fetch(`${API_BASE_URL}/page-sections.php?key=${encodeURIComponent(key)}`);
+    const response = await fetch(`${API_BASE_URL}/page-sections?key=${encodeURIComponent(key)}`);
     
     if (!response.ok) {
       throw new Error(`Erro ao buscar seção: ${response.statusText}`);
@@ -250,7 +250,7 @@ export async function getPageSectionByKey(key: string): Promise<PageSection> {
  */
 export async function createPageSection(section: PageSectionForm): Promise<PageSection> {
   try {
-    const response = await fetch(`${API_BASE_URL}/page-sections.php`, {
+    const response = await fetch(`${API_BASE_URL}/page-sections`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -276,7 +276,7 @@ export async function createPageSection(section: PageSectionForm): Promise<PageS
  */
 export async function updatePageSection(id: number, updates: Partial<PageSectionForm>): Promise<PageSection> {
   try {
-    const response = await fetch(`${API_BASE_URL}/page-sections.php?id=${id}`, {
+    const response = await fetch(`${API_BASE_URL}/page-sections?id=${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -302,7 +302,7 @@ export async function updatePageSection(id: number, updates: Partial<PageSection
  */
 export async function deletePageSection(id: number): Promise<void> {
   try {
-    const response = await fetch(`${API_BASE_URL}/page-sections.php?id=${id}`, {
+    const response = await fetch(`${API_BASE_URL}/page-sections?id=${id}`, {
       method: 'DELETE',
       headers: getAuthHeader(),
     });
@@ -321,7 +321,7 @@ export async function deletePageSection(id: number): Promise<void> {
  */
 export async function toggleSectionActive(id: number): Promise<PageSection> {
   try {
-    const response = await fetch(`${API_BASE_URL}/page-sections.php?id=${id}&action=toggle`, {
+    const response = await fetch(`${API_BASE_URL}/page-sections?id=${id}&action=toggle`, {
       method: 'PATCH',
       headers: getAuthHeader(),
     });
@@ -343,7 +343,7 @@ export async function toggleSectionActive(id: number): Promise<PageSection> {
  */
 export async function reorderSections(sections: SectionReorderItem[]): Promise<void> {
   try {
-    const response = await fetch(`${API_BASE_URL}/page-sections.php?action=reorder`, {
+    const response = await fetch(`${API_BASE_URL}/page-sections?action=reorder`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

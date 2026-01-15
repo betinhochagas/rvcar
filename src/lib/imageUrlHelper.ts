@@ -4,7 +4,7 @@
 
 /**
  * Converte uma URL de imagem relativa para absoluta
- * Em desenvolvimento, usa o servidor PHP (porta 3000)
+ * Em desenvolvimento, usa o servidor backend (porta 3000)
  * Em produção, usa URL relativa do mesmo domínio
  */
 export function getAbsoluteImageUrl(relativePath: string): string {

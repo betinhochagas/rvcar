@@ -15,6 +15,7 @@ npm run dev
 ```
 
 Acesse:
+
 - Frontend: http://localhost:8080
 - API: http://localhost:8080/api
 
@@ -44,12 +45,14 @@ Data (JSON Files)
 ## 📡 Endpoints da API
 
 ### Autenticação
+
 - `POST /api/auth/login` - Login admin
 - `POST /api/auth/logout` - Logout
 - `GET /api/auth/verify` - Verificar token
 - `POST /api/auth/change-password` - Alterar senha
 
 ### Veículos
+
 - `GET /api/vehicles` - Listar todos
 - `GET /api/vehicles/[id]` - Buscar por ID
 - `POST /api/vehicles` - Criar novo (requer auth)
@@ -58,12 +61,14 @@ Data (JSON Files)
 - `PATCH /api/vehicles/[id]` - Toggle disponibilidade (requer auth)
 
 ### Configurações
+
 - `GET /api/site-settings` - Listar todas
 - `GET /api/site-settings/[key]` - Buscar por chave
 - `POST /api/site-settings` - Criar/atualizar (requer auth)
 - `DELETE /api/site-settings/[key]` - Remover (requer auth)
 
 ### Upload
+
 - `POST /api/upload` - Upload de imagens (requer auth)
 
 ## 🔒 Segurança
@@ -104,6 +109,7 @@ git push origin master
 ## 🛠️ Tecnologias
 
 **Frontend:**
+
 - React 18.3
 - TypeScript 5.6
 - Vite 6.0
@@ -111,6 +117,7 @@ git push origin master
 - shadcn/ui
 
 **Backend:**
+
 - TypeScript 5.6
 - Vercel Serverless Functions
 - Node.js 20.x runtime

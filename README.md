@@ -123,8 +123,8 @@ npm run dev
 
 ```
 rvcar/
-├── api/                          # Backend PHP
-│   ├── .env.example             # Template TypeScript (Serverless)
+├── api/                          # Backend TypeScript (Serverless)
+│   ├── .env.example             # Template de variáveis de ambiente
 │   ├── auth/
 │   │   ├── login/route.ts       # Login
 │   │   ├── logout/route.ts      # Logout
