@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import type { AdminUser, AdminToken } from '../types/auth';
-import { readJsonFile, writeJsonFile, getDataPath } from './file-ops';
+import type { AdminUser, AdminToken } from '../types/auth.js';
+import { readJsonFile, writeJsonFile, getDataPath } from './file-ops.js';
 
 const USERS_FILE = getDataPath('admin-users.json');
 const TOKENS_FILE = getDataPath('admin-tokens.json');

@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import type { VercelRequest } from '@vercel/node';
-import type { RateLimits, RateLimitResult } from '../types/security';
-import { readJsonFile, writeJsonFile, getDataPath } from './file-ops';
-import { logRateLimitBlock } from './logger';
+import type { RateLimits, RateLimitResult } from '../types/security.js';
+import { readJsonFile, writeJsonFile, getDataPath } from './file-ops.js';
+import { logRateLimitBlock } from './logger.js';
 
 const RATE_LIMIT_FILE = getDataPath('rate-limits.json');
 

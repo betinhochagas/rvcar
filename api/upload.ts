@@ -1,11 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { put } from '@vercel/blob';
-import { handleOptions, isOptionsRequest } from './lib/cors';
-import { sendResponse, sendError } from './lib/response';
-import { validateToken, extractTokenFromHeader } from './lib/auth';
-import { checkRateLimit, recordAttempt, getRateLimitIdentifier } from './lib/rate-limiter';
-import { logFileUpload, logSecurityEvent } from './lib/logger';
-import { getUploadPath } from './lib/file-ops';
+import { handleOptions, isOptionsRequest } from './lib/cors.js';
+import { sendResponse, sendError } from './lib/response.js';
+import { validateToken, extractTokenFromHeader } from './lib/auth.js';
+import { checkRateLimit, recordAttempt, getRateLimitIdentifier } from './lib/rate-limiter.js';
+import { logFileUpload, logSecurityEvent } from './lib/logger.js';
+import { getUploadPath } from './lib/file-ops.js';
 import sharp from 'sharp';
 import fs from 'fs/promises';
 import path from 'path';

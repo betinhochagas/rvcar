@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { applyCorsHeaders } from './cors';
+import { applyCorsHeaders } from './cors.js';
 
 /**
  * Envia resposta de sucesso com CORS

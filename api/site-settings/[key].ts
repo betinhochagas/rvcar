@@ -1,10 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { handleOptions, isOptionsRequest, applyCorsHeaders } from '../lib/cors';
-import { sendResponse, sendError, getJsonBody, validateContentType } from '../lib/response';
-import { validateToken, extractTokenFromHeader } from '../lib/auth';
-import { logCrudOperation } from '../lib/logger';
-import { readJsonFile, writeJsonFile, getDataPath } from '../lib/file-ops';
-import type { SiteSettingsData } from '../types/settings';
+import { handleOptions, isOptionsRequest, applyCorsHeaders } from '../lib/cors.js';
+import { sendResponse, sendError, getJsonBody, validateContentType } from '../lib/response.js';
+import { validateToken, extractTokenFromHeader } from '../lib/auth.js';
+import { logCrudOperation } from '../lib/logger.js';
+import { readJsonFile, writeJsonFile, getDataPath } from '../lib/file-ops.js';
+import type { SiteSettingsData } from '../types/settings.js';
 
 const SETTINGS_FILE = getDataPath('site-settings.json');
 

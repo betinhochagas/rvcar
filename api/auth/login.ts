@@ -1,18 +1,18 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { handleOptions, isOptionsRequest } from '../lib/cors';
-import { sendResponse, sendError, getJsonBody } from '../lib/response';
-import { loginSchema, formatZodError } from '../lib/validator';
+import { handleOptions, isOptionsRequest } from '../lib/cors.js';
+import { sendResponse, sendError, getJsonBody } from '../lib/response.js';
+import { loginSchema, formatZodError } from '../lib/validator.js';
 import { 
   findUserByUsername, 
   verifyPassword, 
   createToken 
-} from '../lib/auth';
+} from '../lib/auth.js';
 import { 
   checkRateLimit, 
   recordAttempt, 
   getRateLimitIdentifier 
-} from '../lib/rate-limiter';
-import { logLoginAttempt } from '../lib/logger';
+} from '../lib/rate-limiter.js';
+import { logLoginAttempt } from '../lib/logger.js';
 
 /**
  * Handler principal para /api/auth/login

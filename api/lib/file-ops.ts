@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { getData, setData, STORAGE_KEYS } from './storage';
+import { getData, setData, STORAGE_KEYS } from './storage.js';
 
 // Detectar ambiente
 const isVercel = process.env.VERCEL === '1';

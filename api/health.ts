@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { handleOptions, isOptionsRequest } from './lib/cors';
-import { sendResponse } from './lib/response';
-import { checkStorage } from './lib/storage';
+import { handleOptions, isOptionsRequest } from './lib/cors.js';
+import { sendResponse } from './lib/response.js';
+import { checkStorage } from './lib/storage.js';
 
 /**
  * GET /api/health

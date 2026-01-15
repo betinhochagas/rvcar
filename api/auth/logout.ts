@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { handleOptions, isOptionsRequest } from '../lib/cors';
-import { sendResponse, sendError } from '../lib/response';
-import { validateToken, revokeUserTokens, extractTokenFromHeader } from '../lib/auth';
-import { logSecurityEvent } from '../lib/logger';
+import { handleOptions, isOptionsRequest } from '../lib/cors.js';
+import { sendResponse, sendError } from '../lib/response.js';
+import { validateToken, revokeUserTokens, extractTokenFromHeader } from '../lib/auth.js';
+import { logSecurityEvent } from '../lib/logger.js';
 
 /**
  * Handler principal para /api/auth/logout

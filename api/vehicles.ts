@@ -1,11 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { handleOptions, isOptionsRequest, applyCorsHeaders } from './lib/cors';
-import { sendResponse, sendError, getJsonBody, validateContentType } from './lib/response';
-import { createVehicleSchema, formatZodError } from './lib/validator';
-import { validateToken, extractTokenFromHeader } from './lib/auth';
-import { logCrudOperation } from './lib/logger';
-import { readJsonFile, writeJsonFile, getDataPath } from './lib/file-ops';
-import type { Vehicle } from './types/vehicle';
+import { handleOptions, isOptionsRequest, applyCorsHeaders } from './lib/cors.js';
+import { sendResponse, sendError, getJsonBody, validateContentType } from './lib/response.js';
+import { createVehicleSchema, formatZodError } from './lib/validator.js';
+import { validateToken, extractTokenFromHeader } from './lib/auth.js';
+import { logCrudOperation } from './lib/logger.js';
+import { readJsonFile, writeJsonFile, getDataPath } from './lib/file-ops.js';
+import type { Vehicle } from './types/vehicle.js';
 
 const VEHICLES_FILE = getDataPath('vehicles.json');
 

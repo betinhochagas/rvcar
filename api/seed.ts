@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { kv } from '@vercel/kv';
-import { handleOptions, isOptionsRequest, applyCorsHeaders } from './lib/cors';
-import { sendResponse, sendError } from './lib/response';
-import { validateToken, extractTokenFromHeader } from './lib/auth';
-import { STORAGE_KEYS } from './lib/storage';
+import { handleOptions, isOptionsRequest, applyCorsHeaders } from './lib/cors.js';
+import { sendResponse, sendError } from './lib/response.js';
+import { validateToken, extractTokenFromHeader } from './lib/auth.js';
+import { STORAGE_KEYS } from './lib/storage.js';
 import bcrypt from 'bcryptjs';
 
 // Dados iniciais

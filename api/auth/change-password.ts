@@ -1,15 +1,15 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { handleOptions, isOptionsRequest } from '../lib/cors';
-import { sendResponse, sendError, getJsonBody } from '../lib/response';
-import { changePasswordSchema, formatZodError } from '../lib/validator';
+import { handleOptions, isOptionsRequest } from '../lib/cors.js';
+import { sendResponse, sendError, getJsonBody } from '../lib/response.js';
+import { changePasswordSchema, formatZodError } from '../lib/validator.js';
 import { 
   validateToken,
   verifyPassword,
   updateUserPassword,
   revokeUserTokens,
   createToken
-} from '../lib/auth';
-import { logPasswordChange } from '../lib/logger';
+} from '../lib/auth.js';
+import { logPasswordChange } from '../lib/logger.js';
 
 /**
  * Handler principal para /api/auth/change-password

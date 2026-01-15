@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { handleOptions, isOptionsRequest } from '../lib/cors';
-import { sendResponse, sendError, getJsonBody } from '../lib/response';
-import { verifyTokenSchema, formatZodError } from '../lib/validator';
-import { validateToken } from '../lib/auth';
+import { handleOptions, isOptionsRequest } from '../lib/cors.js';
+import { sendResponse, sendError, getJsonBody } from '../lib/response.js';
+import { verifyTokenSchema, formatZodError } from '../lib/validator.js';
+import { validateToken } from '../lib/auth.js';
 
 /**
  * Handler principal para /api/auth/verify
