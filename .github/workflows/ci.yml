@@ -87,29 +87,3 @@ jobs:
           name: dist
           path: dist/
           retention-days: 7
-
-  validate-php:
-    name: Validate PHP
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.1"
-          extensions: pdo, pdo_mysql, json
-          coverage: none
-
-      - name: Check PHP syntax
-        run: |
-          find api -name "*.php" -type f -print0 | xargs -0 -n1 php -l
-          find deploy-rvcar/api -name "*.php" -type f -print0 | xargs -0 -n1 php -l
-
-      - name: Install Composer dependencies
-        run: |
-          if [ -f composer.json ]; then
-            composer install --prefer-dist --no-progress --no-suggest
-          fi

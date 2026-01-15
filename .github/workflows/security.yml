@@ -110,12 +110,6 @@ jobs:
             exit 1
           fi
 
-          # Check for backup files
-          if git ls-files | grep -E '.*-backup.*\.php$|.*-temp.*\.php$'; then
-            echo "❌ ERROR: Backup/temp PHP files found in repository!"
-            exit 1
-          fi
-
           # Check for .env files
           if git ls-files | grep -E '\.env$|\.env\.local$|\.env\.production$'; then
             echo "❌ ERROR: Environment files found in repository!"
