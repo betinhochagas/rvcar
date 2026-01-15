@@ -55,16 +55,29 @@ Documentação completa das otimizações de SEO implementadas e pendentes para 
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   "name": "RV Car Locações e Investimentos",
-  "description": "...",
+  "description": "Aluguel de carros para motoristas de aplicativo em Blumenau SC...",
   "url": "https://www.rvcarlocacoes.com.br",
+  "telephone": "+55-47-98855-6370",
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Blumenau",
     "addressRegion": "SC",
     "addressCountry": "BR"
   },
-  "geo": { ... },
-  "openingHoursSpecification": { ... },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "-26.9194",
+    "longitude": "-49.0661"
+  },
+  "openingHoursSpecification": {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    "opens": "08:00",
+    "closes": "18:00"
+  },
+  "sameAs": [
+    "https://www.instagram.com/rvcarlocacoes.investimentos/"
+  ],
   "hasOfferCatalog": { ... }
 }
 ```
@@ -93,27 +106,30 @@ Allow: /
 Sitemap: https://www.rvcarlocacoes.com.br/sitemap.xml
 ```
 
-### 10. Google Search Console
-**Arquivo de verificação:** `google/google5de2021852aa3db6.html`
+### 10. Google Search Console - Verificação ✅
+**Meta Tag de verificação:** Adicionada no `index.html`
 
-- Arquivo HTML de verificação de propriedade adicionado
-- Necessário configurar rewrite no Vercel para servir o arquivo
+```html
+<meta name="google-site-verification" content="_H_RsE_hJaeTEWOrAW9v07MJG-eUBo3mmOQSg06cgeU" />
+```
+
+**Arquivo HTML de backup:** `public/google5de2021852aa3db6.html`
+
+### 11. Telefone Real no Schema.org ✅
+- Telefone atualizado para: `+55-47-98855-6370`
+
+### 12. Redes Sociais no Schema.org ✅
+- Instagram adicionado: `https://www.instagram.com/rvcarlocacoes.investimentos/`
 
 ---
 
-## 🔧 Configuração Necessária
+## ⏳ Aguardando Deploy
 
-### Vercel - Servir arquivo de verificação do Google
+> **Nota:** O Vercel atingiu o limite de 100 deploys/dia. Aguardando liberação (~3 horas a partir de 15/01/2026).
 
-Adicionar no `vercel.json`:
-
-```json
-{
-  "rewrites": [
-    { "source": "/google5de2021852aa3db6.html", "destination": "/google/google5de2021852aa3db6.html" }
-  ]
-}
-```
+Após o deploy, será possível:
+1. Verificar propriedade no Google Search Console (via Tag HTML)
+2. Submeter o sitemap
 
 ---
 
@@ -123,21 +139,18 @@ Adicionar no `vercel.json`:
 
 - [ ] **Verificar propriedade no Google Search Console**
   - Acessar: https://search.google.com/search-console
-  - Adicionar propriedade: www.rvcarlocacoes.com.br
-  - Verificar via arquivo HTML
+  - Usar método: **Tag HTML** (já configurada)
+  - Clicar em VERIFICAR após deploy
 
 - [ ] **Submeter Sitemap no Google Search Console**
   - URL: https://www.rvcarlocacoes.com.br/sitemap.xml
+  - Menu: Sitemaps → Adicionar → `sitemap.xml`
   - Monitorar indexação das páginas
 
 - [ ] **Google My Business**
   - Criar perfil da empresa
   - Adicionar fotos, horários, serviços
   - Vincular ao site
-
-- [ ] **Atualizar telefone real no Schema.org**
-  - Editar `index.html` linha do JSON-LD
-  - Substituir `+55-47-99999-9999` pelo número real
 
 ### Média Prioridade
 
@@ -161,9 +174,9 @@ Adicionar no `vercel.json`:
 
 ### Baixa Prioridade
 
-- [ ] **Redes Sociais**
-  - Criar Instagram/Facebook da empresa
-  - Adicionar links no Schema.org `sameAs`
+- [ ] **Facebook da empresa**
+  - Criar página no Facebook
+  - Adicionar ao Schema.org `sameAs`
 
 - [ ] **Imagens otimizadas**
   - Adicionar `alt` descritivo em todas as imagens
@@ -178,7 +191,7 @@ Adicionar no `vercel.json`:
 
 - [ ] **HTTPS e Segurança**
   - ✅ Já está com HTTPS via Vercel
-  - Headers de segurança configurados
+  - ✅ Headers de segurança configurados (CSP)
 
 ---
 
@@ -213,8 +226,8 @@ Adicionar no `vercel.json`:
 |---------|-------------|-----------|
 | sitemap.xml | `public/sitemap.xml` | Mapa do site para crawlers |
 | robots.txt | `public/robots.txt` | Instruções para crawlers |
-| Verificação Google | `google/google5de2021852aa3db6.html` | Verificação Search Console |
-| Meta tags | `index.html` | Tags OG, Twitter, Schema.org |
+| Verificação Google | `public/google5de2021852aa3db6.html` | Verificação Search Console (backup) |
+| Meta tags | `index.html` | Tags OG, Twitter, Schema.org, verificação Google |
 
 ---
 
@@ -222,12 +235,27 @@ Adicionar no `vercel.json`:
 
 Antes de cada deploy, verificar:
 
-- [ ] Meta tags atualizadas
-- [ ] Sitemap atualizado com novas páginas
-- [ ] Schema.org com informações corretas
-- [ ] Imagens OG com dimensões 1200x630
-- [ ] Robots.txt permitindo indexação
+- [x] Meta tags atualizadas
+- [x] Sitemap atualizado com novas páginas
+- [x] Schema.org com informações corretas
+- [x] Imagens OG com dimensões 1200x630
+- [x] Robots.txt permitindo indexação
+- [x] Telefone real no Schema.org
+- [x] Redes sociais no Schema.org
+- [x] Meta tag de verificação do Google
 
 ---
 
-*Última atualização: Janeiro 2026*
+## 📅 Histórico de Alterações
+
+| Data | Alteração |
+|------|-----------|
+| 15/01/2026 | Implementação inicial de SEO (meta tags, OG, Twitter, Schema.org) |
+| 15/01/2026 | Criação do sitemap.xml e atualização do robots.txt |
+| 15/01/2026 | Adição da meta tag de verificação do Google Search Console |
+| 15/01/2026 | Atualização do telefone real: +55-47-98855-6370 |
+| 15/01/2026 | Adição do Instagram ao Schema.org sameAs |
+
+---
+
+*Última atualização: 15 de Janeiro de 2026*
