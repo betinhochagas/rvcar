@@ -185,24 +185,24 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
       return sendError(res, req, 'Formato de imagem inválido', 400);
     }
 
-    // Gerar nome único
+    // Gerar nome único - sempre WebP para otimização
     const uniqueId = nanoid(10);
-    const outputFormat = metadata.format === 'png' ? 'png' : 'jpeg';
-    const filename = `${uniqueId}.${outputFormat}`;
+    const filename = `${uniqueId}.webp`;
 
-    // Otimizar imagem com Sharp
+    // Otimizar imagem com Sharp - converter para WebP
     let optimizedBuffer: Buffer;
     
-    if (outputFormat === 'png') {
+    try {
+      // WebP oferece melhor compressão que JPEG/PNG
+      // quality: 85 mantém boa qualidade visual
+      // effort: 4 é um bom balanço entre velocidade e compressão
       optimizedBuffer = await sharp(buffer)
         .resize(1920, 1080, { fit: 'inside', withoutEnlargement: true })
-        .png({ compressionLevel: 9 })
+        .webp({ quality: 85, effort: 4 })
         .toBuffer();
-    } else {
-      optimizedBuffer = await sharp(buffer)
-        .resize(1920, 1080, { fit: 'inside', withoutEnlargement: true })
-        .jpeg({ quality: 85 })
-        .toBuffer();
+    } catch (sharpError) {
+      console.error('Erro ao processar imagem com Sharp:', sharpError);
+      return sendError(res, req, 'Erro ao processar imagem', 500);
     }
 
     // Salvar localmente
