@@ -7,7 +7,7 @@ import { fetchWithRetry } from './fetchWithRetry';
 const getApiUrl = (): string => {
   // Se houver variável de ambiente, usa ela
   if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL.replace('/vehicles.php', '');
+    return import.meta.env.VITE_API_URL;
   }
   
   // Em produção, usa URL relativa (mesmo domínio)

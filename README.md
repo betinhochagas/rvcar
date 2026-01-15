@@ -82,11 +82,11 @@ Sistema completo para locação de veículos e gestão de investimentos em frota
 
 ### Backend
 
-| Tecnologia          | Requisito                |
-| ------------------- | ------------------------ |
-| Node.js             | 20.x+ (Vercel Runtime)   |
-| TypeScript          | 5.6+                     |
-| Sistema de arquivos | Permissões de escrita    |
+| Tecnologia          | Requisito              |
+| ------------------- | ---------------------- |
+| Node.js             | 20.x+ (Vercel Runtime) |
+| TypeScript          | 5.6+                   |
+| Sistema de arquivos | Permissões de escrita  |
 
 ## 📦 Instalação
 
@@ -189,7 +189,7 @@ rvcar/
 
 #### Frontend (`.env`)
 
-```env
+````env
 # URLEnvironment Variables (Vercel)
 
 Configure no dashboard da Vercel ou em `.env.local`:
@@ -211,7 +211,7 @@ LOGIN_TIMEOUT_MINUTES=15
 
 # CORS
 ALLOWED_ORIGINS=https://seu-dominio.com
-```
+````
 
 📚 **Documentação completa**: [docs/INSTALACAO.md](docs/INSTALACAO.md)
 Vercel (Recomendado - Deploy Único)

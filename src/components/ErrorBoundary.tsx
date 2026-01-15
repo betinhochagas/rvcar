@@ -36,7 +36,7 @@ class ErrorBoundary extends Component<Props, State> {
     // Em produção, enviar para serviço de logging
     if (import.meta.env.PROD) {
       // Enviar para backend ou serviço de monitoramento
-      fetch('/api/log-error.php', {
+      fetch('/api/log-error', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

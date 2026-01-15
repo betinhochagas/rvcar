@@ -6,7 +6,7 @@ import { fetchWithRetry } from './fetchWithRetry';
 
 const getAuthApiUrl = (): string => {
   if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL.replace('/vehicles.php', '').replace('/auth.php', '');
+    return import.meta.env.VITE_API_URL;
   }
   
   if (import.meta.env.PROD) {

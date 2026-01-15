@@ -1,153 +1,127 @@
-# 📚 Documentação - RV Car
+# 📚 Documentação RV Car
 
-Bem-vindo à documentação completa do sistema RV Car.
+Sistema de locação de veículos desenvolvido com **React + TypeScript** (frontend) e **Vercel Serverless Functions** (backend).
 
-## 🚀 Começando
+## 🚀 Quick Start
 
-Novo no projeto? Comece aqui:
+```bash
+# Clone e instale
+git clone https://github.com/betinhochagas/rvcar.git
+cd rvcar
+npm install
 
-1. **[Início Rápido](QUICK-START.md)** - Configure e rode em 5 minutos
-2. **[Guia de Instalação](INSTALACAO.md)** - Instalação completa e detalhada
-3. **[Configuração](CONFIGURACAO.md)** - Todas as opções de configuração
+# Inicie em desenvolvimento
+npm run dev
+```
 
-## 📖 Guias
+Acesse:
+- Frontend: http://localhost:8080
+- API: http://localhost:8080/api
+
+## 📖 Guias Principais
 
 ### Para Desenvolvedores
 
-- **[Documentação da API](API.md)** - Todos os endpoints e exemplos
-- **[Estrutura do Projeto](../README.md#estrutura-do-projeto)** - Organização dos arquivos
-- **[Contribuindo](../CONTRIBUTING.md)** - Como contribuir com o projeto
+- **[API.md](API.md)** - Documentação completa da API REST
+- **[TESTING.md](TESTING.md)** - Guia de testes (unitários e integração)
 
 ### Para Deploy
 
-- **[Guia de Deploy](DEPLOY.md)** - Deploy completo (Frontend + Backend)
-- **[Vercel Deploy](DEPLOY.md#deploy-do-frontend-vercel)** - Deploy do frontend
-- **[PHP Backend Deploy](DEPLOY.md#deploy-do-backend-php)** - Deploy do backend
+- **Deploy Vercel**: Conecte o repositório no dashboard da Vercel
+- **Variáveis de Ambiente**: Configure `JWT_SECRET` no dashboard
+- **Domínio Personalizado**: Configure em Settings > Domains
 
-### Segurança
-
-- **[Segurança](../SECURITY.md)** - Recursos de segurança implementados
-- **[Changelog](../CHANGELOG.md)** - Histórico de versões e mudanças
-
-## 🎯 Casos de Uso
-
-### Eu quero...
-
-**...rodar o projeto localmente**
-→ [Início Rápido](QUICK-START.md)
-
-**...fazer deploy em produção**
-→ [Guia de Deploy](DEPLOY.md)
-
-**...entender a API**
-→ [Documentação da API](API.md)
-
-**...configurar variáveis de ambiente**
-→ [Configuração](CONFIGURACAO.md)
-
-**...personalizar o sistema**
-→ [Painel Admin](CONFIGURACAO.md#configurações-do-site)
-
-**...contribuir com código**
-→ [Contribuindo](../CONTRIBUTING.md)
-
-## 📁 Estrutura da Documentação
+## 🏗️ Arquitetura
 
 ```
-docs/
-├── README.md           # Este arquivo
-├── QUICK-START.md      # Início rápido (5 minutos)
-├── INSTALACAO.md       # Guia de instalação completo
-├── CONFIGURACAO.md     # Todas as configurações
-├── API.md              # Documentação da API
-└── DEPLOY.md           # Guia de deploy
-
-../
-├── README.md           # Documentação principal
-├── CHANGELOG.md        # Histórico de versões
-├── CONTRIBUTING.md     # Como contribuir
-├── SECURITY.md         # Segurança
-└── LICENSE             # Licença MIT
+Frontend (React + Vite)
+    ↓ HTTP Requests
+Backend (TypeScript Serverless)
+    ↓ Read/Write
+Data (JSON Files)
 ```
 
-## 🔍 Busca Rápida
+## 📡 Endpoints da API
 
-### Comandos Essenciais
+### Autenticação
+- `POST /api/auth/login` - Login admin
+- `POST /api/auth/logout` - Logout
+- `GET /api/auth/verify` - Verificar token
+- `POST /api/auth/change-password` - Alterar senha
+
+### Veículos
+- `GET /api/vehicles` - Listar todos
+- `GET /api/vehicles/[id]` - Buscar por ID
+- `POST /api/vehicles` - Criar novo (requer auth)
+- `PUT /api/vehicles/[id]` - Atualizar (requer auth)
+- `DELETE /api/vehicles/[id]` - Remover (requer auth)
+- `PATCH /api/vehicles/[id]` - Toggle disponibilidade (requer auth)
+
+### Configurações
+- `GET /api/site-settings` - Listar todas
+- `GET /api/site-settings/[key]` - Buscar por chave
+- `POST /api/site-settings` - Criar/atualizar (requer auth)
+- `DELETE /api/site-settings/[key]` - Remover (requer auth)
+
+### Upload
+- `POST /api/upload` - Upload de imagens (requer auth)
+
+## 🔒 Segurança
+
+- ✅ Rate limiting (5 tentativas/15min)
+- ✅ JWT tokens com expiração
+- ✅ CORS configurado
+- ✅ Validação de entrada (Zod)
+- ✅ Upload seguro (MIME type validation)
+- ✅ File locking (previne race conditions)
+
+## 🧪 Testes
 
 ```bash
-# Instalar dependências
-npm install
+# Executar todos os testes
+npm test
 
-# Desenvolvimento
-npm run dev
+# Testes com interface
+npm run test:ui
 
-# Build de produção
+# Coverage
+npm run test:coverage
+```
+
+## 📦 Build & Deploy
+
+```bash
+# Build local
 npm run build
 
-# Testes
-npm run test
+# Preview do build
+npm run preview
 
-# Linting
-npm run lint
+# Deploy Vercel (automático via Git)
+git push origin master
 ```
 
-### Configuração Rápida
+## 🛠️ Tecnologias
 
-**Frontend** (`.env`):
+**Frontend:**
+- React 18.3
+- TypeScript 5.6
+- Vite 6.0
+- TailwindCSS 3.4
+- shadcn/ui
 
-```env
-VITE_API_URL=http://localhost/rvcar/api
-```
+**Backend:**
+- TypeScript 5.6
+- Vercel Serverless Functions
+- Node.js 20.x runtime
+- JSON file storage
 
-**Backend** (`api/.env`):
+## 📞 Suporte
 
-```env
-ENVIRONMENT=production
-JWT_SECRET=sua-chave-secreta
-ADMIN_PASSWORD=senha-temporaria
-ALLOWED_ORIGINS=https://seu-dominio.com
-```
-
-### URLs Importantes
-
-- **Repositório**: https://github.com/betinhochagas/rvcar
-- **Demo**: https://rvcar.vercel.app
-- **Issues**: https://github.com/betinhochagas/rvcar/issues
-
-## ❓ Precisa de Ajuda?
-
-1. **Consulte a documentação** relevante acima
-2. **Veja exemplos** no código fonte
-3. **Procure issues similares** no GitHub
-4. **Abra uma nova issue** se necessário
-
-## 📊 Status do Projeto
-
-- **Versão atual**: 2.1.1
-- **Status**: Produção ✅
-- **Score de Segurança**: Backend 9.5/10 | Frontend 9.5/10
-- **Cobertura de Testes**: Em desenvolvimento
-
-## 🎓 Recursos Adicionais
-
-### Tecnologias Utilizadas
-
-- [React](https://react.dev/) - Framework frontend
-- [TypeScript](https://www.typescriptlang.org/) - Tipagem estática
-- [Vite](https://vitejs.dev/) - Build tool
-- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
-- [shadcn/ui](https://ui.shadcn.com/) - Componentes UI
-
-### Ferramentas Recomendadas
-
-- **Editor**: VS Code
-- **Extensions**:
-  - ES7+ React/Redux/React-Native snippets
-  - Tailwind CSS IntelliSense
-  - PHP IntelliSense
-- **Testing**: Chrome DevTools, Postman
+- 🐛 **Bugs**: [GitHub Issues](https://github.com/betinhochagas/rvcar/issues)
+- 📧 **Email**: contato@rvcar.com.br
+- 📝 **Changelog**: [CHANGELOG.md](../CHANGELOG.md)
 
 ---
 
-**Última atualização**: Janeiro 2026  
-**Mantenedor**: [@betinhochagas](https://github.com/betinhochagas)
+**Desenvolvido com ❤️ por Betinho Chagas**

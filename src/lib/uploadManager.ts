@@ -8,7 +8,7 @@ import { getToken } from './authManager';
 
 const getUploadApiUrl = (): string => {
   if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL.replace('/vehicles.php', '').replace('/upload.php', '');
+    return import.meta.env.VITE_API_URL;
   }
   
   if (import.meta.env.PROD) {
