@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    
+    <!-- Content Security Policy - Proteção contra XSS e injeção de scripts -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval';
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: https: http:;
+      connect-src 'self' http://localhost:* http://192.168.*:* http://10.*:*;
+      frame-ancestors 'none';
+      base-uri 'self';
+      form-action 'self';
+    " />
+    
+    <title>Carregando...</title>
+    <meta name="description" content="Sistema de gestão empresarial com painel administrativo completo" />
+    <meta name="author" content="Sistema Empresarial" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <meta property="og:title" content="Sistema Empresarial | Painel Administrativo" />
+    <meta property="og:description" content="Aluguel de carros para motoristas de app desde R$650/semana. Invista em frotas com renda passiva garantida." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/favicon.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sistema Empresarial" />
+    <meta name="twitter:description" content="Aluguel de carros para app e investimento em frotas" />
+    <meta name="twitter:image" content="/favicon.png" />
+    
+    <!-- Carregar configurações antes do React -->
+    <script>
+      (function() {
+        const hostname = window.location.hostname;
+        let apiUrl;
+        
+        // Detectar ambiente e definir URL da API
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+          // Acessando via localhost
+          apiUrl = 'http://localhost:3000/api/site-settings.php';
+        } else if (hostname.match(/^(192\.168\.|10\.)/)) {
+          // Acessando via IP da rede local - usar o mesmo IP
+          apiUrl = `http://${hostname}:3000/api/site-settings.php`;
+        } else if (window.location.protocol === 'https:') {
+          // Produção (HTTPS) - usar URL relativa
+          apiUrl = '/api/site-settings.php';
+        } else {
+          // Fallback para localhost
+          apiUrl = 'http://localhost:3000/api/site-settings.php';
+        }
+        
+        console.log('[index.html] API URL:', apiUrl);
+        
+        // SEMPRE carregar configurações do servidor (sem cache)
+        fetch(apiUrl, {
+          cache: 'no-store' // Força sempre buscar do servidor
+        })
+          .then(res => res.json())
+          .then(configs => {
+            // Usar site_title se disponível, senão usar site_name
+            const siteTitle = configs.find(c => c.config_key === 'site_title');
+            const siteName = configs.find(c => c.config_key === 'site_name');
+            const siteFavicon = configs.find(c => c.config_key === 'site_favicon');
+            
+            // Atualizar título
+            if (siteTitle && siteTitle.config_value) {
+              document.title = siteTitle.config_value;
+            } else if (siteName && siteName.config_value) {
+              document.title = siteName.config_value;
+            }
+            
+            // Atualizar favicon
+            if (siteFavicon && siteFavicon.config_value) {
+              const timestamp = new Date().getTime();
+              const faviconUrl = siteFavicon.config_value.includes('?') 
+                ? siteFavicon.config_value + '&t=' + timestamp
+                : siteFavicon.config_value + '?t=' + timestamp;
+              
+              const faviconLink = document.querySelector('link[rel="icon"]');
+              if (faviconLink) {
+                faviconLink.href = faviconUrl;
+              }
+              const shortcutIcon = document.querySelector('link[rel="shortcut icon"]');
+              if (shortcutIcon) {
+                shortcutIcon.href = faviconUrl;
+              }
+              const appleTouchIcon = document.querySelector('link[rel="apple-touch-icon"]');
+              if (appleTouchIcon) {
+                appleTouchIcon.href = faviconUrl;
+              }
+            }
+            
+            // Armazenar no sessionStorage para uso rápido
+            sessionStorage.setItem('siteConfigs', JSON.stringify(configs));
+          })
+          .catch(err => {
+            console.warn('Não foi possível carregar configurações:', err);
+            // Usar valores do cache se disponível
+            const cached = sessionStorage.getItem('siteConfigs');
+            if (cached) {
+              const configs = JSON.parse(cached);
+              const siteTitle = configs.find(c => c.config_key === 'site_title');
+              const siteName = configs.find(c => c.config_key === 'site_name');
+              const siteFavicon = configs.find(c => c.config_key === 'site_favicon');
+              
+              if (siteTitle && siteTitle.config_value) {
+                document.title = siteTitle.config_value;
+              } else if (siteName && siteName.config_value) {
+                document.title = siteName.config_value;
+              }
+              
+              if (siteFavicon && siteFavicon.config_value) {
+                const timestamp = new Date().getTime();
+                const faviconUrl = siteFavicon.config_value.includes('?') 
+                  ? siteFavicon.config_value + '&t=' + timestamp
+                  : siteFavicon.config_value + '?t=' + timestamp;
+                  
+                const faviconLink = document.querySelector('link[rel="icon"]');
+                if (faviconLink) faviconLink.href = faviconUrl;
+                
+                const shortcutIcon = document.querySelector('link[rel="shortcut icon"]');
+                if (shortcutIcon) shortcutIcon.href = faviconUrl;
+                
+                const appleTouchIcon = document.querySelector('link[rel="apple-touch-icon"]');
+                if (appleTouchIcon) appleTouchIcon.href = faviconUrl;
+              }
+            }
+          });
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

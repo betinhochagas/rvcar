@@ -1,0 +1,29 @@
+# Ignorar arquivos PHP antigos
+*.php
+api/*.php
+install/
+
+# Arquivos Apache (incompatíveis com Vercel)
+.htaccess
+.htaccess-*
+**/.htaccess
+
+# Ignorar arquivos de desenvolvimento
+node_modules/
+.env.local
+.env.development
+.DS_Store
+
+# Ignorar arquivos de teste
+test-*.js
+test-*.ps1
+server.mjs
+
+# Ignorar logs
+*.log
+logs/
+
+# Ignorar arquivos temporários
+.cache/
+temp/
+tmp/
