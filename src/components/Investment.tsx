@@ -81,6 +81,10 @@ const Investment = () => {
                 src={investmentImg}
                 alt="Investimento em Frota"
                 className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+                width={800}
+                height={600}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-dark/50 to-transparent" />
             </div>

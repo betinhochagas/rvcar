@@ -50,6 +50,11 @@ const Hero = () => {
           src={heroBg}
           alt={`${siteName} - Locação de Veículos`}
           className="w-full h-full object-cover"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+          width={1920}
+          height={1080}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-dark/90 via-dark/70 to-dark/50" />
       </div>
