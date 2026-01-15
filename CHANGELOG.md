@@ -5,6 +5,50 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [2.1.3] - 2026-01-14
+
+### 🧹 Limpeza Profunda - Remoção Completa de PHP
+
+#### Contexto
+
+Após migração completa para TypeScript Serverless (Vercel), removidas TODAS as referências a PHP do projeto para evitar confusão futura e garantir deploy limpo.
+
+#### Removido
+
+- 🗑️ **test-login.html** - Arquivo de teste com endpoints `.php`
+- 🗑️ **api/.env.example** - Configurações PHP/MySQL antigas
+- 🗑️ **coverage/** - 51 arquivos de testes antigos com referências `.php`
+
+#### Atualizado
+
+- ✏️ **.gitignore** - Removidas regras para arquivos PHP backup/temp
+- ✏️ **src/lib/siteConfigManager.ts** - Removido `.replace(/.php$/)`, atualizado `page-sections.php` → `page-sections` (8x)
+- ✏️ **src/lib/imageUrlHelper.ts** - Comentário: "servidor PHP" → "servidor backend"
+- ✏️ **src/lib/authManager.ts** - Removidas referências `.replace('.php')`
+- ✏️ **src/lib/vehicleManager.ts** - Removidas referências `.replace('.php')`
+- ✏️ **index.html** - `/api/site-settings.php` → `/api/site-settings` (4x)
+- ✏️ **public/test-api.html** - `vehicles.php` → `vehicles`, "Servidor PHP" → "backend"
+- ✏️ **README.md** - "Backend PHP" → "Backend TypeScript (Serverless)"
+- ✏️ **CHANGELOG.md** - Atualizado para refletir apenas TypeScript
+
+#### Commits Realizados
+
+- `91201c0` - Limpeza GitHub workflows
+- `4b162d8` - Documentação movida para docs-legacy
+- `4dbf499` - Managers limpos (.replace PHP)
+- `0d7aaaf` - Limpeza profunda completa
+
+#### Resultado
+
+✅ **ZERO referências `.php` em código ativo**  
+✅ **ZERO referências PHP em TypeScript**  
+✅ **ZERO referências PHP em HTML**  
+✅ **Projeto 100% TypeScript puro**
+
+> **Nota**: Referências históricas preservadas em `docs-legacy/` para consulta.
+
+---
+
 ## [2.1.2] - 2026-01-14
 
 ### 📚 Documentação
@@ -17,7 +61,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - ✅ **docs/INSTALACAO.md** - Guia completo de instalação
 - ✅ **docs/CONFIGURACAO.md** - Todas as opções de configuração
 - ✅ **docs/API.md** - Documentação completa da API com exemplos
-- ✅ **docs/DEPLOY.md** - Guia de deploy (Vercel + Servidor PHP)
+- ✅ **docs/DEPLOY.md** - Guia de deploy Vercel (TypeScript Serverless)
+- ✅ **docs/TESTING.md** - Guia de testes com Vitest
 - ✅ README.md principal reescrito e modernizado
 
 #### Removido
@@ -39,7 +84,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [2.1.1] - 2026-01-14
 
-### 🔒 Segurança - Backend
+### 🔒 Segurança - Backend TypeScript
 
 #### Adicionado
 
@@ -49,10 +94,10 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - ✅ Validação profunda de upload com proteção contra MIME spoofing
 - ✅ Sistema de tokens CSRF para proteção contra ataques CSRF
 - ✅ Headers de segurança HTTP (CSP, X-Frame-Options, etc)
-- ✅ Proteção de diretórios sensíveis com `.htaccess`
-- ✅ Sistema de validação de entrada (`input-validator.php`)
-- ✅ Sistema de logging de segurança (`security-logger.php`)
-- ✅ File locking em todas operações de I/O (`file-operations.php`)
+- ✅ Proteção de diretórios sensíveis
+- ✅ Sistema de validação de entrada TypeScript
+- ✅ Sistema de logging de segurança
+- ✅ File locking em todas operações de I/O
 
 #### Corrigido
 
@@ -112,15 +157,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ### 📊 Estatísticas
 
-**Arquivos Criados (Backend):** 9
+**Arquivos Criados (Backend TypeScript):** 8
 
-- `api/.env.example` - Template de configuração
-- `api/env-loader.php` - Loader de variáveis
-- `api/rate-limiter.php` - Rate limiting
-- `api/csrf-protection.php` - Proteção CSRF
-- `api/input-validator.php` - Validação de entrada
-- `api/security-logger.php` - Logging de segurança
-- `api/file-operations.php` - File locking
+- `api/lib/auth.ts` - Autenticação JWT
+- `api/lib/rate-limiter.ts` - Rate limiting
+- `api/lib/cors.ts` - Configuração CORS
+- `api/lib/validator.ts` - Validação de entrada
+- `api/lib/logger.ts` - Logging de segurança
+- `api/lib/file-ops.ts` - Operações de arquivo
 - `data/.htaccess` - Proteção de JSON
 - `uploads/.htaccess` - Proteção de uploads
 
