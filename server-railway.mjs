@@ -211,6 +211,58 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Debug endpoint para verificar storage
+app.get('/api/debug/storage', async (req, res) => {
+  try {
+    const storageBase = process.env.NODE_ENV === 'production' ? '/app/storage' : __dirname;
+    const dataDir = join(storageBase, 'data');
+    const settingsFile = join(dataDir, 'site-settings.json');
+    
+    // Verificar se diretórios existem
+    let dataDirExists = false;
+    let settingsFileExists = false;
+    let settingsContent = null;
+    
+    try {
+      await fs.access(dataDir);
+      dataDirExists = true;
+    } catch {}
+    
+    try {
+      await fs.access(settingsFile);
+      settingsFileExists = true;
+      settingsContent = await fs.readFile(settingsFile, 'utf-8');
+    } catch {}
+    
+    // Listar conteúdo do storage
+    let storageContents = [];
+    try {
+      storageContents = await fs.readdir(storageBase);
+    } catch {}
+    
+    let dataContents = [];
+    if (dataDirExists) {
+      try {
+        dataContents = await fs.readdir(dataDir);
+      } catch {}
+    }
+    
+    res.status(200).json({
+      storageBase,
+      dataDir,
+      settingsFile,
+      dataDirExists,
+      settingsFileExists,
+      settingsContent: settingsContent ? JSON.parse(settingsContent) : null,
+      storageContents,
+      dataContents,
+      NODE_ENV: process.env.NODE_ENV
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ============================================================================
 // AUTENTICAÇÃO (consolidado)
 // ============================================================================
