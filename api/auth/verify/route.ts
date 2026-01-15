@@ -4,8 +4,6 @@ import { sendResponse, sendError, parseJsonBody } from '../../lib/response';
 import { verifyTokenSchema, formatZodError } from '../../lib/validator';
 import { validateToken } from '../../lib/auth';
 
-export const runtime = 'nodejs';
-
 /**
  * POST /api/auth/verify
  * Verifica validade de um token

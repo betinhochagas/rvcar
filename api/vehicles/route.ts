@@ -7,8 +7,6 @@ import { logCrudOperation } from '../lib/logger';
 import { readJsonFile, writeJsonFile, getDataPath } from '../lib/file-ops';
 import type { Vehicle } from '../types/vehicle';
 
-export const runtime = 'nodejs';
-
 const VEHICLES_FILE = getDataPath('vehicles.json');
 
 /**

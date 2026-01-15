@@ -6,7 +6,6 @@ import { logCrudOperation } from '../../lib/logger';
 import { readJsonFile, writeJsonFile, getDataPath } from '../../lib/file-ops';
 import type { SiteSettingsData } from '../../types/settings';
 
-export const runtime = 'nodejs';
 
 const SETTINGS_FILE = getDataPath('site-settings.json');
 

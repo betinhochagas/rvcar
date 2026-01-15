@@ -11,8 +11,6 @@ import {
 } from '../../lib/auth';
 import { logPasswordChange } from '../../lib/logger';
 
-export const runtime = 'nodejs';
-
 /**
  * POST /api/auth/change-password
  * Altera senha do usuário autenticado

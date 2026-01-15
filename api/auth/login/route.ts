@@ -14,8 +14,6 @@ import {
 } from '../../lib/rate-limiter';
 import { logLoginAttempt } from '../../lib/logger';
 
-export const runtime = 'nodejs'; // Usar Node.js runtime para file system
-
 /**
  * POST /api/auth/login
  * Autentica usuário e retorna token

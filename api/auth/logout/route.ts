@@ -4,8 +4,6 @@ import { sendResponse, sendError } from '../../lib/response';
 import { validateToken, revokeUserTokens, extractTokenFromHeader } from '../../lib/auth';
 import { logSecurityEvent } from '../../lib/logger';
 
-export const runtime = 'nodejs';
-
 /**
  * POST /api/auth/logout
  * Revoga o token do usuário
