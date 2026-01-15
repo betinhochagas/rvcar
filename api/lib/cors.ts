@@ -3,6 +3,14 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 // Type definition for headers
 type CorsHeaders = Record<string, string>;
 
+// Lista de origens permitidas em produção
+const ALLOWED_ORIGINS = [
+  'https://rvcar.vercel.app',
+  'https://www.rvcarlocacoes.com.br',
+  'https://rvcarlocacoes.com.br',
+  'https://rvcar-production.up.railway.app',
+];
+
 /**
  * Configura headers CORS baseado no ambiente
  */
@@ -25,25 +33,25 @@ export function getCorsHeaders(req: VercelRequest): CorsHeaders {
   };
 
   if (isProduction) {
-    // Produção: apenas permitir origem do próprio domínio
-    const protocol = (req.headers['x-forwarded-proto'] as string) || 'https';
-    const allowedOrigins = [
-      `${protocol}://${host}`,
-      `https://${host}`,
-      `http://${host}`,
-    ];
-
-    if (origin && allowedOrigins.includes(origin)) {
+    // Verificar se a origem está na lista de permitidas
+    if (origin && ALLOWED_ORIGINS.includes(origin)) {
       headers['Access-Control-Allow-Origin'] = origin;
       headers['Access-Control-Allow-Credentials'] = 'true';
+    } else if (origin) {
+      // Se não está na lista mas tem origin, usar a primeira origem permitida
+      headers['Access-Control-Allow-Origin'] = ALLOWED_ORIGINS[0];
     } else {
-      headers['Access-Control-Allow-Origin'] = `${protocol}://${host}`;
+      // Sem origin (ex: curl, Postman)
+      headers['Access-Control-Allow-Origin'] = '*';
     }
   } else {
     // Desenvolvimento: permitir origens locais
     const isLocal = origin.match(/^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?$/);
     
     if (origin && isLocal) {
+      headers['Access-Control-Allow-Origin'] = origin;
+      headers['Access-Control-Allow-Credentials'] = 'true';
+    } else if (origin && ALLOWED_ORIGINS.includes(origin)) {
       headers['Access-Control-Allow-Origin'] = origin;
       headers['Access-Control-Allow-Credentials'] = 'true';
     } else {

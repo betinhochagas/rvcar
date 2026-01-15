@@ -38,9 +38,41 @@ const STORAGE_BASE = process.env.NODE_ENV === 'production'
   ? '/app/storage' 
   : __dirname;
 
+// Lista de origens permitidas
+const ALLOWED_ORIGINS = [
+  'https://rvcar.vercel.app',
+  'https://www.rvcarlocacoes.com.br',
+  'https://rvcarlocacoes.com.br',
+  'http://localhost:8080',
+  'http://localhost:3000',
+  'http://localhost:5173',
+];
+
+// Adicionar FRONTEND_URL se definida
+if (process.env.FRONTEND_URL) {
+  ALLOWED_ORIGINS.push(process.env.FRONTEND_URL);
+}
+
 // Middlewares
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: function(origin, callback) {
+    // Permitir requisições sem origin (ex: mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    
+    // Verificar se a origem está na lista permitida
+    if (ALLOWED_ORIGINS.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Permitir origens locais em desenvolvimento
+    if (origin.match(/^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?$/)) {
+      return callback(null, true);
+    }
+    
+    // Log para debug
+    console.log('CORS blocked origin:', origin);
+    return callback(null, false);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'X-Seed-Secret']
