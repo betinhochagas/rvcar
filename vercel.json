@@ -14,11 +14,7 @@
       "destination": "https://rvcar-production.up.railway.app/uploads/:path*"
     },
     {
-      "source": "/google:file*.html",
-      "destination": "/google/google:file*.html"
-    },
-    {
-      "source": "/((?!assets|api|uploads|google).*)",
+      "source": "/((?!assets|api|uploads|google5de2021852aa3db6.html|sitemap.xml|robots.txt).*)",
       "destination": "/index.html"
     }
   ],
