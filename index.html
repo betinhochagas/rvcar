@@ -7,28 +7,40 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <!-- Content Security Policy - Proteção contra XSS e injeção de scripts -->
+    <!-- SEO Meta Tags -->
+    <title>RV Car - Locações e Investimentos | Aluguel de Carros para App em Blumenau SC</title>
+    <meta name="description" content="Aluguel de carros para motoristas de Uber, 99 e aplicativos em Blumenau SC. Veículos a partir de R$650/semana. Invista em frotas com renda passiva garantida." />
+    <meta name="keywords" content="aluguel de carros, locação de veículos, motorista de app, uber, 99, blumenau, santa catarina, investimento em frotas, renda passiva, aluguel semanal" />
+    <meta name="author" content="RV Car Locações" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <link rel="canonical" href="https://www.rvcarlocacoes.com.br/" />
+    
+    <!-- Geo Tags -->
+    <meta name="geo.region" content="BR-SC" />
+    <meta name="geo.placename" content="Blumenau" />
+    <meta name="geo.position" content="-26.9194;-49.0661" />
+    <meta name="ICBM" content="-26.9194, -49.0661" />
+    
+    <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       font-src 'self' https://fonts.gstatic.com;
       img-src 'self' data: https: http:;
-      connect-src 'self' https://*.railway.app https://rvcar-production.up.railway.app http://localhost:* http://127.0.0.1:*;
+      connect-src 'self' https://*.railway.app https://rvcar-production.up.railway.app https://www.google-analytics.com http://localhost:* http://127.0.0.1:*;
       frame-ancestors 'none';
       base-uri 'self';
       form-action 'self';
     " />
-    
-    <title>RV Car - Locações e Investimentos</title>
-    <meta name="description" content="Aluguel de carros para motoristas de app desde R$650/semana. Invista em frotas com renda passiva garantida." />
-    <meta name="author" content="RV Car" />
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     
+    <!-- Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -36,18 +48,67 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.rvcarlocacoes.com.br/" />
-    <meta property="og:title" content="RV Car - Locações e Investimentos" />
-    <meta property="og:description" content="Aluguel de carros para motoristas de app desde R$650/semana. Invista em frotas com renda passiva garantida." />
+    <meta property="og:title" content="RV Car - Locações e Investimentos | Aluguel de Carros para App" />
+    <meta property="og:description" content="Aluguel de carros para motoristas de Uber, 99 e aplicativos em Blumenau SC. Veículos a partir de R$650/semana. Invista em frotas com renda passiva." />
     <meta property="og:image" content="https://www.rvcarlocacoes.com.br/uploads/site/egmxFz7Rur.jpeg" />
-    <meta property="og:site_name" content="RV Car" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="RV Car Locações" />
     <meta property="og:locale" content="pt_BR" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://www.rvcarlocacoes.com.br/" />
-    <meta name="twitter:title" content="RV Car - Locações e Investimentos" />
-    <meta name="twitter:description" content="Aluguel de carros para motoristas de app desde R$650/semana. Invista em frotas com renda passiva garantida." />
+    <meta name="twitter:title" content="RV Car - Locações e Investimentos | Aluguel de Carros para App" />
+    <meta name="twitter:description" content="Aluguel de carros para motoristas de Uber, 99 e aplicativos em Blumenau SC. Veículos a partir de R$650/semana." />
     <meta name="twitter:image" content="https://www.rvcarlocacoes.com.br/uploads/site/egmxFz7Rur.jpeg" />
+    
+    <!-- Schema.org JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "RV Car Locações e Investimentos",
+      "description": "Aluguel de carros para motoristas de aplicativo em Blumenau SC. Locação semanal a partir de R$650. Investimento em frotas com renda passiva.",
+      "url": "https://www.rvcarlocacoes.com.br",
+      "logo": "https://www.rvcarlocacoes.com.br/uploads/site/egmxFz7Rur.jpeg",
+      "image": "https://www.rvcarlocacoes.com.br/uploads/site/egmxFz7Rur.jpeg",
+      "telephone": "+55-47-99999-9999",
+      "priceRange": "R$650 - R$1200",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Blumenau",
+        "addressRegion": "SC",
+        "addressCountry": "BR"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "-26.9194",
+        "longitude": "-49.0661"
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "08:00",
+        "closes": "18:00"
+      },
+      "sameAs": [],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Veículos para Locação",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Product",
+              "name": "Locação Semanal de Veículos",
+              "description": "Aluguel de carros para motoristas de aplicativo por semana"
+            }
+          }
+        ]
+      }
+    }
+    </script>
     
     <!-- Carregar configurações antes do React -->
     <script>
