@@ -35,7 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
  */
 async function handleGet(req: VercelRequest, res: VercelResponse) {
   try {
-    const vehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE);
+    const vehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE, []);
     
     // Filtros opcionais via query params
     const availableOnly = req.query.available === 'true';
@@ -94,7 +94,7 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
     const vehicleData = validation.data;
 
     // Ler veículos existentes
-    const vehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE);
+    const vehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE, []);
 
     // Gerar novo ID
     const maxId = vehicles.length > 0 ? Math.max(...vehicles.map((v: Vehicle) => v.id)) : 0;

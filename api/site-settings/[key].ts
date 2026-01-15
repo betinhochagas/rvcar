@@ -43,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
  */
 async function handleGet(req: VercelRequest, res: VercelResponse, key: string) {
   try {
-    const data = await readJsonFile<SiteSettingsData>(SETTINGS_FILE);
+    const data = await readJsonFile<SiteSettingsData>(SETTINGS_FILE, {});
 
     if (!(key in data)) {
       return sendError(res, req, 'Configuração não encontrada', 404);
@@ -96,7 +96,7 @@ async function handlePut(req: VercelRequest, res: VercelResponse, key: string) {
     }
 
     // Ler dados atuais
-    const data = await readJsonFile<SiteSettingsData>(SETTINGS_FILE);
+    const data = await readJsonFile<SiteSettingsData>(SETTINGS_FILE, {});
 
     // Atualizar ou criar configuração
     data[key] = {
@@ -146,7 +146,7 @@ async function handleDelete(req: VercelRequest, res: VercelResponse, key: string
     }
 
     // Ler dados atuais
-    const data = await readJsonFile<SiteSettingsData>(SETTINGS_FILE);
+    const data = await readJsonFile<SiteSettingsData>(SETTINGS_FILE, {});
 
     if (!(key in data)) {
       return sendError(res, req, 'Configuração não encontrada', 404);

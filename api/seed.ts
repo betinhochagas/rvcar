@@ -101,7 +101,7 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
     const force = req.query.force === 'true';
 
     // Verificar se já existem dados
-    const existingVehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE);
+    const existingVehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE, []);
     
     if (existingVehicles.length > 0 && !force) {
       return sendResponse(res, req, {
@@ -114,7 +114,7 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
     }
 
     // Criar usuário admin padrão se não existir
-    const existingUsers = await readJsonFile<AdminUser[]>(USERS_FILE);
+    const existingUsers = await readJsonFile<AdminUser[]>(USERS_FILE, []);
     let adminCreated = false;
     
     if (existingUsers.length === 0 || force) {
@@ -165,9 +165,9 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
 async function handleGet(req: VercelRequest, res: VercelResponse) {
   try {
     // Verificar dados existentes
-    const vehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE);
-    const settings = await readJsonFile<SiteSettingsData>(SETTINGS_FILE);
-    const users = await readJsonFile<AdminUser[]>(USERS_FILE);
+    const vehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE, []);
+    const settings = await readJsonFile<SiteSettingsData>(SETTINGS_FILE, {});
+    const users = await readJsonFile<AdminUser[]>(USERS_FILE, []);
 
     return sendResponse(res, req, {
       success: true,

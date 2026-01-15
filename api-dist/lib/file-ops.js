@@ -46,19 +46,26 @@ export function getUploadPath(subdir) {
 /**
  * Lê arquivo JSON
  */
-export async function readJsonFile(filePath) {
+export async function readJsonFile(filePath, defaultValue) {
     try {
         const exists = await fs.access(filePath).then(() => true).catch(() => false);
         if (!exists) {
-            return [];
+            // Se defaultValue foi fornecido, usar ele; senão retornar objeto ou array vazio
+            if (defaultValue !== undefined) {
+                return defaultValue;
+            }
+            return {};
         }
         const content = await fs.readFile(filePath, 'utf-8');
+        if (!content || content.trim() === '') {
+            return defaultValue !== undefined ? defaultValue : {};
+        }
         const data = JSON.parse(content);
         return data;
     }
     catch (error) {
         console.error(`Erro ao ler arquivo ${filePath}:`, error);
-        return [];
+        return defaultValue !== undefined ? defaultValue : {};
     }
 }
 /**

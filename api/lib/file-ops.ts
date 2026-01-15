@@ -56,19 +56,26 @@ export function getUploadPath(subdir?: string): string {
 /**
  * Lê arquivo JSON
  */
-export async function readJsonFile<T>(filePath: string): Promise<T> {
+export async function readJsonFile<T>(filePath: string, defaultValue?: T): Promise<T> {
   try {
     const exists = await fs.access(filePath).then(() => true).catch(() => false);
     if (!exists) {
-      return [] as unknown as T;
+      // Se defaultValue foi fornecido, usar ele; senão retornar objeto ou array vazio
+      if (defaultValue !== undefined) {
+        return defaultValue;
+      }
+      return {} as T;
     }
 
     const content = await fs.readFile(filePath, 'utf-8');
+    if (!content || content.trim() === '') {
+      return defaultValue !== undefined ? defaultValue : {} as T;
+    }
     const data = JSON.parse(content);
     return data as T;
   } catch (error) {
     console.error(`Erro ao ler arquivo ${filePath}:`, error);
-    return [] as unknown as T;
+    return defaultValue !== undefined ? defaultValue : {} as T;
   }
 }
 

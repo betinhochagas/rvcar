@@ -44,7 +44,7 @@ export default async function handler(req, res) {
  */
 async function handleGet(req, res) {
     try {
-        const data = await readJsonFile(SETTINGS_FILE);
+        const data = await readJsonFile(SETTINGS_FILE, {});
         const settings = convertToResponseFormat(data);
         // Filtros opcionais via query params
         const key = req.query.key;
@@ -103,7 +103,7 @@ async function handlePost(req, res) {
             }
         }
         // Ler dados atuais
-        const data = await readJsonFile(SETTINGS_FILE);
+        const data = await readJsonFile(SETTINGS_FILE, {});
         // Atualizar/criar configurações
         for (const setting of settingsToCreate) {
             data[setting.config_key] = {

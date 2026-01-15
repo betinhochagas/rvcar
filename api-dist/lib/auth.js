@@ -7,7 +7,7 @@ const TOKENS_FILE = getDataPath('admin-tokens.json');
  * Lê usuários do arquivo
  */
 export async function readUsers() {
-    const users = await readJsonFile(USERS_FILE);
+    const users = await readJsonFile(USERS_FILE, []);
     // Se não existir usuário, criar admin padrão
     if (!users || users.length === 0) {
         // Usar ADMIN_PASSWORD da variável de ambiente ou gerar aleatória
@@ -62,7 +62,7 @@ export async function writeUsers(users) {
  * Lê tokens do arquivo
  */
 export async function readTokens() {
-    return await readJsonFile(TOKENS_FILE);
+    return await readJsonFile(TOKENS_FILE, []);
 }
 /**
  * Escreve tokens no arquivo

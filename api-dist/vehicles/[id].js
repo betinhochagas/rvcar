@@ -39,7 +39,7 @@ export default async function handler(req, res) {
  */
 async function handleGet(req, res, id) {
     try {
-        const vehicles = await readJsonFile(VEHICLES_FILE);
+        const vehicles = await readJsonFile(VEHICLES_FILE, []);
         const vehicle = vehicles.find((v) => v.id === id);
         if (!vehicle) {
             return sendError(res, req, 'Veículo não encontrado', 404);
@@ -83,7 +83,7 @@ async function handlePut(req, res, id) {
         }
         const updates = validation.data;
         // Ler veículos
-        const vehicles = await readJsonFile(VEHICLES_FILE);
+        const vehicles = await readJsonFile(VEHICLES_FILE, []);
         const vehicleIndex = vehicles.findIndex((v) => v.id === id);
         if (vehicleIndex === -1) {
             return sendError(res, req, 'Veículo não encontrado', 404);
@@ -128,7 +128,7 @@ async function handleDelete(req, res, id) {
             return sendError(res, req, 'Token inválido ou expirado', 401);
         }
         // Ler veículos
-        const vehicles = await readJsonFile(VEHICLES_FILE);
+        const vehicles = await readJsonFile(VEHICLES_FILE, []);
         const filteredVehicles = vehicles.filter((v) => v.id !== id);
         if (filteredVehicles.length === vehicles.length) {
             return sendError(res, req, 'Veículo não encontrado', 404);
@@ -160,7 +160,7 @@ async function handlePatch(req, res, id) {
             return sendError(res, req, 'Token inválido ou expirado', 401);
         }
         // Ler veículos
-        const vehicles = await readJsonFile(VEHICLES_FILE);
+        const vehicles = await readJsonFile(VEHICLES_FILE, []);
         const vehicleIndex = vehicles.findIndex((v) => v.id === id);
         if (vehicleIndex === -1) {
             return sendError(res, req, 'Veículo não encontrado', 404);

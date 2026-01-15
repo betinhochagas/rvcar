@@ -10,7 +10,7 @@ const TOKENS_FILE = getDataPath('admin-tokens.json');
  * Lê usuários do arquivo
  */
 export async function readUsers(): Promise<AdminUser[]> {
-  const users = await readJsonFile<AdminUser[]>(USERS_FILE);
+  const users = await readJsonFile<AdminUser[]>(USERS_FILE, []);
   
   // Se não existir usuário, criar admin padrão
   if (!users || users.length === 0) {
@@ -73,7 +73,7 @@ export async function writeUsers(users: AdminUser[]): Promise<void> {
  * Lê tokens do arquivo
  */
 export async function readTokens(): Promise<AdminToken[]> {
-  return await readJsonFile<AdminToken[]>(TOKENS_FILE);
+  return await readJsonFile<AdminToken[]>(TOKENS_FILE, []);
 }
 
 /**

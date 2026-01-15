@@ -10,7 +10,11 @@
       "destination": "https://rvcar-production.up.railway.app/api/:path*"
     },
     {
-      "source": "/((?!assets|api).*)",
+      "source": "/uploads/:path*",
+      "destination": "https://rvcar-production.up.railway.app/uploads/:path*"
+    },
+    {
+      "source": "/((?!assets|api|uploads).*)",
       "destination": "/index.html"
     }
   ],

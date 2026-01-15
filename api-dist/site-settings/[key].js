@@ -35,7 +35,7 @@ export default async function handler(req, res) {
  */
 async function handleGet(req, res, key) {
     try {
-        const data = await readJsonFile(SETTINGS_FILE);
+        const data = await readJsonFile(SETTINGS_FILE, {});
         if (!(key in data)) {
             return sendError(res, req, 'Configuração não encontrada', 404);
         }
@@ -78,7 +78,7 @@ async function handlePut(req, res, key) {
             return sendError(res, req, 'Dados inválidos', 400);
         }
         // Ler dados atuais
-        const data = await readJsonFile(SETTINGS_FILE);
+        const data = await readJsonFile(SETTINGS_FILE, {});
         // Atualizar ou criar configuração
         data[key] = {
             value: body.config_value ?? body.value ?? '',
@@ -119,7 +119,7 @@ async function handleDelete(req, res, key) {
             return sendError(res, req, 'Token inválido ou expirado', 401);
         }
         // Ler dados atuais
-        const data = await readJsonFile(SETTINGS_FILE);
+        const data = await readJsonFile(SETTINGS_FILE, {});
         if (!(key in data)) {
             return sendError(res, req, 'Configuração não encontrada', 404);
         }

@@ -47,7 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
  */
 async function handleGet(req: VercelRequest, res: VercelResponse, id: number) {
   try {
-    const vehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE);
+    const vehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE, []);
     const vehicle = vehicles.find((v: Vehicle) => v.id === id);
 
     if (!vehicle) {
@@ -102,7 +102,7 @@ async function handlePut(req: VercelRequest, res: VercelResponse, id: number) {
     const updates = validation.data;
 
     // Ler veículos
-    const vehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE);
+    const vehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE, []);
     const vehicleIndex = vehicles.findIndex((v: Vehicle) => v.id === id);
 
     if (vehicleIndex === -1) {
@@ -153,7 +153,7 @@ async function handleDelete(req: VercelRequest, res: VercelResponse, id: number)
     }
 
     // Ler veículos
-    const vehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE);
+    const vehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE, []);
     const filteredVehicles = vehicles.filter((v: Vehicle) => v.id !== id);
 
     if (filteredVehicles.length === vehicles.length) {
@@ -193,7 +193,7 @@ async function handlePatch(req: VercelRequest, res: VercelResponse, id: number) 
     }
 
     // Ler veículos
-    const vehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE);
+    const vehicles = await readJsonFile<Vehicle[]>(VEHICLES_FILE, []);
     const vehicleIndex = vehicles.findIndex((v: Vehicle) => v.id === id);
 
     if (vehicleIndex === -1) {

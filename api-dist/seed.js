@@ -86,7 +86,7 @@ async function handlePost(req, res) {
         // Verificar parâmetro force
         const force = req.query.force === 'true';
         // Verificar se já existem dados
-        const existingVehicles = await readJsonFile(VEHICLES_FILE);
+        const existingVehicles = await readJsonFile(VEHICLES_FILE, []);
         if (existingVehicles.length > 0 && !force) {
             return sendResponse(res, req, {
                 success: false,
@@ -97,7 +97,7 @@ async function handlePost(req, res) {
             }, 200);
         }
         // Criar usuário admin padrão se não existir
-        const existingUsers = await readJsonFile(USERS_FILE);
+        const existingUsers = await readJsonFile(USERS_FILE, []);
         let adminCreated = false;
         if (existingUsers.length === 0 || force) {
             const hashedPassword = await bcrypt.hash('rvcar2024', 10);
@@ -144,9 +144,9 @@ async function handlePost(req, res) {
 async function handleGet(req, res) {
     try {
         // Verificar dados existentes
-        const vehicles = await readJsonFile(VEHICLES_FILE);
-        const settings = await readJsonFile(SETTINGS_FILE);
-        const users = await readJsonFile(USERS_FILE);
+        const vehicles = await readJsonFile(VEHICLES_FILE, []);
+        const settings = await readJsonFile(SETTINGS_FILE, {});
+        const users = await readJsonFile(USERS_FILE, []);
         return sendResponse(res, req, {
             success: true,
             storage: 'file',

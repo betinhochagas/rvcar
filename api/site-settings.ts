@@ -53,7 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
  */
 async function handleGet(req: VercelRequest, res: VercelResponse) {
   try {
-    const data = await readJsonFile<SiteSettingsData>(SETTINGS_FILE);
+    const data = await readJsonFile<SiteSettingsData>(SETTINGS_FILE, {});
     const settings = convertToResponseFormat(data);
     
     // Filtros opcionais via query params
@@ -125,7 +125,7 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
     }
 
     // Ler dados atuais
-    const data = await readJsonFile<SiteSettingsData>(SETTINGS_FILE);
+    const data = await readJsonFile<SiteSettingsData>(SETTINGS_FILE, {});
 
     // Atualizar/criar configurações
     for (const setting of settingsToCreate) {

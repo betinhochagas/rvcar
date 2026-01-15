@@ -29,7 +29,7 @@ export default async function handler(req, res) {
  */
 async function handleGet(req, res) {
     try {
-        const vehicles = await readJsonFile(VEHICLES_FILE);
+        const vehicles = await readJsonFile(VEHICLES_FILE, []);
         // Filtros opcionais via query params
         const availableOnly = req.query.available === 'true';
         let filteredVehicles = vehicles;
@@ -75,7 +75,7 @@ async function handlePost(req, res) {
         }
         const vehicleData = validation.data;
         // Ler veículos existentes
-        const vehicles = await readJsonFile(VEHICLES_FILE);
+        const vehicles = await readJsonFile(VEHICLES_FILE, []);
         // Gerar novo ID
         const maxId = vehicles.length > 0 ? Math.max(...vehicles.map((v) => v.id)) : 0;
         const id = maxId + 1;
