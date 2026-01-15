@@ -330,8 +330,12 @@ app.options('/api/upload', (req, res) => {
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(join(__dirname, 'dist')));
   
-  // SPA fallback (Express 5.x syntax)
-  app.get('/{*splat}', (req, res) => {
+  // SPA fallback - NÃO deve capturar rotas /api
+  app.get('/{*splat}', (req, res, next) => {
+    // Se for rota de API, não serve o index.html
+    if (req.originalUrl.startsWith('/api')) {
+      return res.status(404).json({ error: 'API endpoint not found' });
+    }
     res.sendFile(join(__dirname, 'dist', 'index.html'));
   });
 }
