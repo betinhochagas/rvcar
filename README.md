@@ -1,6 +1,6 @@
 # 🚗 RV Car - Sistema de Locação de Veículos
 
-Sistema completo para locação de veículos e gestão de investimentos em frota, desenvolvido com React + TypeScript no frontend e PHP no backend.
+Sistema completo para locação de veículos e gestão de investimentos em frota, desenvolvido com React + TypeScript no frontend e Vercel Serverless Functions no backend.
 
 [![Versão](https://img.shields.io/badge/versão-2.1.1-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -27,9 +27,9 @@ Sistema completo para locação de veículos e gestão de investimentos em frota
 - **Segurança**: Error boundaries e validação de entrada
 - **Acessibilidade**: Componentes acessíveis (WCAG)
 
-### Backend (PHP)
+### Backend (TypeScript Serverless)
 
-- **API RESTful**: Endpoints bem documentados
+- **API RESTful**: Endpoints bem documentados com Vercel Functions
 - **Armazenamento JSON**: Sem necessidade de banco de dados
 - **Segurança Avançada**:
   - Rate limiting (5 tentativas/15min)
@@ -37,7 +37,7 @@ Sistema completo para locação de veículos e gestão de investimentos em frota
   - Validação profunda de uploads
   - Headers de segurança HTTP
   - Sistema de logs
-- **Autenticação**: Sistema de tokens seguro
+- **Autenticação**: Sistema de tokens JWT seguro
 
 ### Funcionalidades para Clientes
 
@@ -63,7 +63,7 @@ Sistema completo para locação de veículos e gestão de investimentos em frota
 **Frontend**: [https://rvcar.vercel.app](https://rvcar.vercel.app)  
 **Painel Admin**: [https://rvcar.vercel.app/admin](https://rvcar.vercel.app/admin)
 
-> **Nota**: O backend precisa ser hospedado separadamente (PHP).
+> **Nota**: Backend e frontend hospedados no Vercel (deploy único).
 
 ## 🛠️ Tecnologias
 
@@ -84,8 +84,8 @@ Sistema completo para locação de veículos e gestão de investimentos em frota
 
 | Tecnologia          | Requisito                |
 | ------------------- | ------------------------ |
-| PHP                 | 7.4+                     |
-| Extensões PHP       | `json`, `fileinfo`, `gd` |
+| Node.js             | 20.x+ (Vercel Runtime)   |
+| TypeScript          | 5.6+                     |
 | Sistema de arquivos | Permissões de escrita    |
 
 ## 📦 Instalação
@@ -93,7 +93,6 @@ Sistema completo para locação de veículos e gestão de investimentos em frota
 ### Pré-requisitos
 
 - **Node.js** 18+ ou **Bun** 1.0+
-- **PHP** 7.4+ (para backend)
 - **Git**
 
 ### Instalação Rápida
@@ -125,17 +124,25 @@ npm run dev
 ```
 rvcar/
 ├── api/                          # Backend PHP
-│   ├── .env.example             # Template de configuração
-│   ├── auth.php                 # Autenticação
-│   ├── vehicles.php             # CRUD de veículos
-│   ├── site-settings.php        # Configurações do site
-│   ├── upload.php               # Upload de imagens
-│   ├── rate-limiter.php         # Rate limiting
-│   ├── csrf-protection.php      # Proteção CSRF
-│   ├── input-validator.php      # Validação de entrada
-│   ├── security-logger.php      # Sistema de logs
-│   └── file-operations.php      # Operações de arquivo
-│
+│   ├── .env.example             # Template TypeScript (Serverless)
+│   ├── auth/
+│   │   ├── login/route.ts       # Login
+│   │   ├── logout/route.ts      # Logout
+│   │   ├── verify/route.ts      # Verificação de token
+│   │   └── change-password/route.ts
+│   ├── vehicles/
+│   │   ├── route.ts             # CRUD veículos
+│   │   └── [id]/route.ts        # Operações por ID
+│   ├── site-settings/
+│   │   ├── route.ts             # Configurações
+│   │   └── [key]/route.ts       # Por chave
+│   ├── upload/route.ts          # Upload de imagens
+│   └── lib/                     # Utilitários do backend
+│       ├── auth.ts
+│       ├── cors.ts
+│       ├── rate-limiter.ts
+│       ├── validator.ts
+│       └── file-ops.ts
 ├── src/                          # Frontend React
 │   ├── components/              # Componentes React
 │   │   ├── ui/                 # Componentes shadcn/ui
@@ -183,23 +190,19 @@ rvcar/
 #### Frontend (`.env`)
 
 ```env
-# URL da API (sem barra no final)
-VITE_API_URL=http://localhost/rvcar/api
+# URLEnvironment Variables (Vercel)
 
-# Ambiente
-VITE_ENVIRONMENT=development
-```
-
-#### Backend (`api/.env`)
+Configure no dashboard da Vercel ou em `.env.local`:
 
 ```env
-# Ambiente (development ou production)
-ENVIRONMENT=production
+# JWT Secret (gerado automaticamente se não definido)
+JWT_SECRET=sua-chave-secreta-forte-256-bits
 
-# Segurança JWT
-JWT_SECRET=sua-chave-secreta-forte
+# Rate Limiting
+MAX_LOGIN_ATTEMPTS=5
+LOGIN_TIMEOUT_MINUTES=15
 
-# Credenciais Admin
+# CORS (opcional, configura no vercel.json)enciais Admin
 ADMIN_PASSWORD=senha-aleatoria
 
 # Rate Limiting
@@ -211,21 +214,16 @@ ALLOWED_ORIGINS=https://seu-dominio.com
 ```
 
 📚 **Documentação completa**: [docs/INSTALACAO.md](docs/INSTALACAO.md)
+Vercel (Recomendado - Deploy Único)
 
-## 🚀 Deploy
-
-### Frontend (Vercel - Recomendado)
-
-O projeto está configurado para deploy automático no Vercel:
+O projeto completo (frontend + backend) é deployado no Vercel:
 
 1. **Conecte seu repositório** ao Vercel
-2. **Configure a variável de ambiente**:
-   - `VITE_API_URL` = URL do seu backend PHP
-3. **Deploy automático** acontece a cada push no `master`
-
-### Backend (Servidor PHP)
-
-O backend pode ser hospedado em qualquer servidor PHP:
+2. **Deploy automático** acontece a cada push no `master`
+3. **Sem configuração extra** necessária (vercel.json já configurado)
+4. **Opcional**: Configure variáveis de ambiente:
+   - `JWT_SECRET` = Chave secreta para tokens
+   - `MAX_LOGIN_ATTEMPTS` = Limite de tentativas de login
 
 - **Gratuitos**: InfinityFree, 000webhost
 - **Pagos**: Hostinger (R$6/mês), DigitalOcean ($4/mês)
