@@ -161,30 +161,36 @@ const SiteSettings = () => {
       {/* Header */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/admin/dashboard')}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar ao Painel
+                <span className="hidden sm:inline">Voltar ao Painel</span>
+                <span className="sm:hidden">Voltar</span>
               </Button>
-              <h1 className="text-2xl font-bold">Configurações do Site</h1>
+              <h1 className="text-lg sm:text-2xl font-bold">Configurações do Site</h1>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => window.open('/', '_blank')}
+                className="flex-1 sm:flex-none"
               >
-                <ExternalLink className="w-4 h-4 mr-2" />
-                Ver Site
+                <ExternalLink className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Ver Site</span>
               </Button>
-              <Button onClick={handleSaveAll} disabled={saving}>
-                <Save className="w-4 h-4 mr-2" />
-                {saving ? 'Salvando...' : 'Salvar Tudo'}
+              <Button onClick={handleSaveAll} disabled={saving} size="sm" className="flex-1 sm:flex-none">
+                {saving ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4 mr-2" />
+                )}
+                {saving ? 'Salvando...' : 'Salvar'}
               </Button>
             </div>
           </div>
@@ -192,24 +198,26 @@ const SiteSettings = () => {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="branding" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="branding">
-              <ImageIcon className="w-4 h-4 mr-2" />
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        <Tabs defaultValue="branding" className="space-y-4 sm:space-y-6">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1">
+            <TabsTrigger value="branding" className="text-xs sm:text-sm">
+              <ImageIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Marca
             </TabsTrigger>
-            <TabsTrigger value="og">
-              <Globe className="w-4 h-4 mr-2" />
-              Preview Links
+            <TabsTrigger value="og" className="text-xs sm:text-sm">
+              <Globe className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Preview Links</span>
+              <span className="sm:hidden">Preview</span>
             </TabsTrigger>
-            <TabsTrigger value="contact">
-              <Mail className="w-4 h-4 mr-2" />
+            <TabsTrigger value="contact" className="text-xs sm:text-sm">
+              <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Contato
             </TabsTrigger>
-            <TabsTrigger value="social">
-              <Share2 className="w-4 h-4 mr-2" />
-              Redes Sociais
+            <TabsTrigger value="social" className="text-xs sm:text-sm">
+              <Share2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Redes Sociais</span>
+              <span className="sm:hidden">Redes</span>
             </TabsTrigger>
           </TabsList>
 
@@ -223,9 +231,9 @@ const SiteSettings = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="site_name">Nome da Empresa</Label>
+                    <Label htmlFor="site_name" className="text-sm sm:text-base">Nome da Empresa</Label>
                     <Input
                       id="site_name"
                       type="text"
@@ -233,13 +241,13 @@ const SiteSettings = () => {
                       onChange={(e) => handleChange('site_name', e.target.value)}
                       placeholder="Nome da Empresa"
                     />
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       Nome usado no header e footer do site
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="site_title">Título do Site</Label>
+                    <Label htmlFor="site_title" className="text-sm sm:text-base">Título do Site</Label>
                     <Input
                       id="site_title"
                       type="text"
@@ -247,7 +255,7 @@ const SiteSettings = () => {
                       onChange={(e) => handleChange('site_title', e.target.value)}
                       placeholder="Nome da Empresa - Sua Descrição"
                     />
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       Título da aba do navegador (se vazio, usa o Nome da Empresa)
                     </p>
                   </div>
