@@ -104,29 +104,68 @@ export const SiteConfigProvider: React.FC<SiteConfigProviderProps> = ({ children
       
       console.log('🖼️ Atualizando favicon para:', faviconUrl);
       
-      // Atualizar TODOS os favicons (PNG, SVG, qualquer tipo)
+      // ESTRATÉGIA: Remover e recriar links para forçar o navegador a recarregar
+      // Isso é necessário porque navegadores fazem cache agressivo de favicons
+      const head = document.head;
       const faviconLinks = document.querySelectorAll('link[rel*="icon"]') as NodeListOf<HTMLLinkElement>;
       console.log('📌 Encontrados', faviconLinks.length, 'elementos de favicon');
       
+      // Detectar tipo de imagem pela extensão
+      const ext = faviconUrl.split('.').pop()?.toLowerCase().split('?')[0];
+      let mimeType = 'image/png';
+      if (ext === 'jpg' || ext === 'jpeg') mimeType = 'image/jpeg';
+      else if (ext === 'ico') mimeType = 'image/x-icon';
+      else if (ext === 'svg') mimeType = 'image/svg+xml';
+      
+      console.log('🎨 Tipo detectado:', mimeType);
+      
+      // Remover TODOS os favicons não-SVG
       faviconLinks.forEach((link, index) => {
-        // Pular apenas o SVG fallback, atualizar todos os outros
         if (link.type !== 'image/svg+xml') {
-          const oldHref = link.href;
-          link.href = faviconUrl;
-          // Forçar o tipo correto baseado na extensão do arquivo
-          const ext = faviconUrl.split('.').pop()?.toLowerCase().split('?')[0];
-          if (ext === 'png') link.type = 'image/png';
-          else if (ext === 'jpg' || ext === 'jpeg') link.type = 'image/jpeg';
-          else if (ext === 'ico') link.type = 'image/x-icon';
-          
-          console.log(`  ✓ [${index}] ${link.rel} atualizado:`, oldHref, '→', link.href);
+          console.log(`  🗑️ [${index}] Removendo ${link.rel} antigo`);
+          link.remove();
         } else {
           console.log(`  ⊗ [${index}] ${link.rel} (SVG) - mantido como fallback`);
         }
       });
       
+      // Criar novos links de favicon
+      // 1. Favicon principal 32x32
+      const favicon32 = document.createElement('link');
+      favicon32.rel = 'icon';
+      favicon32.type = mimeType;
+      favicon32.sizes = '32x32';
+      favicon32.href = faviconUrl;
+      head.insertBefore(favicon32, head.firstChild);
+      console.log('  ✅ Criado favicon 32x32:', faviconUrl);
+      
+      // 2. Favicon 16x16
+      const favicon16 = document.createElement('link');
+      favicon16.rel = 'icon';
+      favicon16.type = mimeType;
+      favicon16.sizes = '16x16';
+      favicon16.href = faviconUrl;
+      head.insertBefore(favicon16, head.firstChild);
+      console.log('  ✅ Criado favicon 16x16:', faviconUrl);
+      
+      // 3. Apple Touch Icon
+      const appleTouchIcon = document.createElement('link');
+      appleTouchIcon.rel = 'apple-touch-icon';
+      appleTouchIcon.sizes = '180x180';
+      appleTouchIcon.href = faviconUrl;
+      head.insertBefore(appleTouchIcon, head.firstChild);
+      console.log('  ✅ Criado apple-touch-icon:', faviconUrl);
+      
+      // 4. Shortcut icon (compatibilidade)
+      const shortcut = document.createElement('link');
+      shortcut.rel = 'shortcut icon';
+      shortcut.type = mimeType;
+      shortcut.href = faviconUrl;
+      head.insertBefore(shortcut, head.firstChild);
+      console.log('  ✅ Criado shortcut icon:', faviconUrl);
+      
       logger.info('Favicon atualizado dinamicamente:', faviconUrl);
-      console.log('✅ Favicon aplicado - verifique a aba do navegador');
+      console.log('✅ Favicon aplicado com sucesso! Novos elementos criados. Force refresh (Ctrl+F5) se não aparecer.');
     }
   }, [configs.site_favicon]);
 
