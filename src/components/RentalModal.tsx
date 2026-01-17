@@ -152,7 +152,7 @@ Mensagem enviada através do site ${siteName}`;
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
         {/* Cabeçalho Fixo */}
-        <DialogHeader className="sticky top-0 bg-background z-10 pb-4 border-b">
+        <DialogHeader className="pb-4 border-b">
           <div className="flex items-center justify-center mb-2">
             <img src={logo} alt={siteName} className="h-12 w-auto" />
           </div>
