@@ -241,25 +241,25 @@ const AdminDashboard = () => {
       {/* Header */}
       <header className="bg-background border-b border-border sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Car className="h-8 w-8 text-primary" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center space-x-3">
+              <Car className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
               <div>
-                <h1 className="text-2xl font-bold">{siteName} - Admin</h1>
-                <p className="text-sm text-muted-foreground">Gerenciamento de Veículos</p>
+                <h1 className="text-lg sm:text-2xl font-bold">{siteName} - Admin</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground">Gerenciamento de Veículos</p>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" onClick={() => navigate('/admin/site-settings')}>
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <Button variant="outline" size="sm" onClick={() => navigate('/admin/site-settings')} className="flex-1 sm:flex-none">
                 Configurações do Site
               </Button>
-              <Button variant="outline" onClick={() => navigate('/')}>
-                <Home className="h-4 w-4 mr-2" />
-                Site
+              <Button variant="outline" size="sm" onClick={() => navigate('/')} className="flex-1 sm:flex-none">
+                <Home className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Site</span>
               </Button>
-              <Button variant="outline" onClick={handleLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Sair
+              <Button variant="outline" size="sm" onClick={handleLogout} className="flex-1 sm:flex-none">
+                <LogOut className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Sair</span>
               </Button>
             </div>
           </div>
@@ -315,7 +315,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Vehicles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {vehicles.map((vehicle) => (
             <VehicleCard
               key={vehicle.id}

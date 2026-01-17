@@ -19,7 +19,7 @@ interface VehicleCardProps {
  */
 const VehicleCard = memo(({ vehicle, onEdit, onDelete, onToggleAvailability }: VehicleCardProps) => {
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden w-full">
       <div className="relative">
         <img
           src={vehicle.image}
@@ -27,19 +27,20 @@ const VehicleCard = memo(({ vehicle, onEdit, onDelete, onToggleAvailability }: V
           className={`w-full h-48 object-cover ${
             !vehicle.available ? 'grayscale opacity-60' : ''
           }`}
+          loading="lazy"
         />
         {!vehicle.available && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-            <span className="text-white font-bold text-lg">INDISPONÍVEL</span>
+            <span className="text-white font-bold text-sm sm:text-lg">INDISPONÍVEL</span>
           </div>
         )}
       </div>
-      <CardContent className="p-4">
-        <h3 className="font-bold text-lg mb-2">{vehicle.name}</h3>
-        <p className="text-2xl font-bold text-primary mb-4">{vehicle.price}/sem</p>
+      <CardContent className="p-3 sm:p-4">
+        <h3 className="font-bold text-base sm:text-lg mb-2 truncate">{vehicle.name}</h3>
+        <p className="text-xl sm:text-2xl font-bold text-primary mb-3 sm:mb-4">R${vehicle.price}/sem</p>
         
-        <div className="flex items-center justify-between mb-4">
-          <Label htmlFor={`available-${vehicle.id}`} className="text-sm">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <Label htmlFor={`available-${vehicle.id}`} className="text-xs sm:text-sm">
             {vehicle.available ? 'Disponível' : 'Indisponível'}
           </Label>
           <Switch
@@ -49,23 +50,23 @@ const VehicleCard = memo(({ vehicle, onEdit, onDelete, onToggleAvailability }: V
           />
         </div>
 
-        <div className="flex space-x-2">
+        <div className="flex gap-2">
           <Button
             variant="outline"
             size="sm"
-            className="flex-1"
+            className="flex-1 text-xs sm:text-sm"
             onClick={() => onEdit(vehicle)}
           >
-            <Edit className="h-4 w-4 mr-1" />
+            <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
             Editar
           </Button>
           <Button
             variant="destructive"
             size="sm"
-            className="flex-1"
+            className="flex-1 text-xs sm:text-sm"
             onClick={() => onDelete(vehicle)}
           >
-            <Trash2 className="h-4 w-4 mr-1" />
+            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
             Excluir
           </Button>
         </div>
