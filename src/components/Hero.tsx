@@ -11,10 +11,10 @@ import ConsultantModal from "./ConsultantModal";
 const Hero = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [lowestPrice, setLowestPrice] = useState<number>(650);
-  const { getConfig } = useSiteConfig();
+  const { getConfig, loading } = useSiteConfig();
   
-  // Configurações dinâmicas
-  const siteName = getConfig('site_name', '');
+  // Configurações dinâmicas com fallbacks
+  const siteName = getConfig('site_name', 'RV Car');
 
   // Buscar menor preço dos veículos
   useEffect(() => {

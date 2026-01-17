@@ -23,16 +23,16 @@ const formatPhone = (phone: string): string => {
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
-  const { getConfig } = useSiteConfig();
+  const { getConfig, loading } = useSiteConfig();
   
-  // Configurações dinâmicas
-  const siteName = getConfig('site_name', '');
-  const siteTagline = getConfig('site_tagline', '');
+  // Configurações dinâmicas com fallbacks
+  const siteName = getConfig('site_name', 'RV Car');
+  const siteTagline = getConfig('site_tagline', 'Locações e Investimentos.');
   const siteLogoRaw = getConfig('site_logo', '');
   // Se não houver logo configurado, usar logo padrão; senão, normalizar URL
   // SEMPRE manter logo padrão visível durante carregamento
   const siteLogo = siteLogoRaw ? getAbsoluteImageUrl(siteLogoRaw) : logoImg;
-  const siteLogoAlt = getConfig('site_logo_alt', '');
+  const siteLogoAlt = getConfig('site_logo_alt', 'RV Car');
   // Usar telefone de locação na navbar
   const contactPhoneRaw = getConfig('contact_phone_rental', '');
   const contactPhone = formatPhone(contactPhoneRaw);

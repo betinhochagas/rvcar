@@ -116,4 +116,23 @@ All colors MUST be HSL.
   body[data-scroll-locked] [style*="position: fixed"] {
     padding-right: var(--removed-body-scroll-bar-size, 0px);
   }
+
+  /* Animação suave para evitar flash durante carregamento */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in forwards;
+  }
+
+  /* Garantir que conteúdo dinâmico apareça suavemente */
+  section, main, article {
+    animation: fadeIn 0.3s ease-in;
+  }
 }
