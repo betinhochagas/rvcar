@@ -70,21 +70,14 @@ export const SiteConfigProvider: React.FC<SiteConfigProviderProps> = ({ children
         ? `${configMap.site_favicon}&t=${timestamp}`
         : `${configMap.site_favicon}?t=${timestamp}`;
       
-      // Atualizar todos os links de favicon
-      const faviconLink = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
-      if (faviconLink) {
-        faviconLink.href = faviconUrl;
-      }
-      
-      const shortcutIcon = document.querySelector('link[rel="shortcut icon"]') as HTMLLinkElement;
-      if (shortcutIcon) {
-        shortcutIcon.href = faviconUrl;
-      }
-      
-      const appleTouchIcon = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement;
-      if (appleTouchIcon) {
-        appleTouchIcon.href = faviconUrl;
-      }
+      // Atualizar todos os links de favicon (PNG e SVG)
+      const faviconLinks = document.querySelectorAll('link[rel*="icon"]') as NodeListOf<HTMLLinkElement>;
+      faviconLinks.forEach((link) => {
+        // Atualizar apenas se for PNG ou shortcut icon, manter SVG como fallback
+        if (link.type === 'image/png' || link.rel === 'shortcut icon' || link.rel === 'apple-touch-icon') {
+          link.href = faviconUrl;
+        }
+      });
     }
   };
 
