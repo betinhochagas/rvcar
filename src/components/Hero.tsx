@@ -15,7 +15,6 @@ const Hero = () => {
   
   // Configurações dinâmicas
   const siteName = getConfig('site_name', '');
-  const buttonCtaText = getConfig('button_cta_text', '');
 
   // Buscar menor preço dos veículos
   useEffect(() => {
@@ -82,16 +81,14 @@ const Hero = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            {buttonCtaText && (
-              <Button
-                size="lg"
-                onClick={() => setIsModalOpen(true)}
-                className="text-base sm:text-lg group"
-              >
-                {buttonCtaText}
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            )}
+            <Button
+              size="lg"
+              onClick={() => setIsModalOpen(true)}
+              className="text-base sm:text-lg group"
+            >
+              Fale com um consultor
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
             <Button
               size="lg"
               variant="outline"

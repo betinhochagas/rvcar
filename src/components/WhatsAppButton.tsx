@@ -1,16 +1,11 @@
 import { useState, useEffect } from "react";
 import { MessageCircle, X } from "lucide-react";
-import { useSiteConfig } from "@/contexts/SiteConfigContext";
 import ConsultantModal from "./ConsultantModal";
 
 const WhatsAppButton = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { getConfig } = useSiteConfig();
-  
-  // Configurações dinâmicas
-  const buttonText = getConfig('button_whatsapp_text', '');
 
   useEffect(() => {
     // Verifica se o usuário já fechou o botão anteriormente (sessão)
@@ -39,8 +34,8 @@ const WhatsAppButton = () => {
     sessionStorage.setItem("whatsappButtonClosed", "true");
   };
 
-  // Não renderiza se foi fechado, ainda não está visível, ou não tem texto configurado
-  if (isClosed || !isVisible || !buttonText) {
+  // Não renderiza se foi fechado ou ainda não está visível
+  if (isClosed || !isVisible) {
     return null;
   }
 
@@ -61,7 +56,7 @@ const WhatsAppButton = () => {
           {/* Texto */}
           <div className="flex flex-col items-start">
             <span className="font-semibold text-sm whitespace-nowrap">
-              {buttonText}
+              Fale com um consultor
             </span>
             <span className="text-xs text-white/90">
               Estamos online!
