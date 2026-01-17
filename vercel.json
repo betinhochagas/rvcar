@@ -29,6 +29,10 @@
     {
       "source": "/uploads/:path*",
       "destination": "https://rvcar-production.up.railway.app/uploads/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "trailingSlash": false,
