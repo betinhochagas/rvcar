@@ -30,7 +30,8 @@ const Navbar = () => {
   const siteTagline = getConfig('site_tagline', '');
   const siteLogoRaw = getConfig('site_logo', '');
   // Se não houver logo configurado, usar logo padrão; senão, normalizar URL
-  const siteLogo = !siteLogoRaw ? logoImg : getAbsoluteImageUrl(siteLogoRaw);
+  // SEMPRE manter logo padrão visível durante carregamento
+  const siteLogo = siteLogoRaw ? getAbsoluteImageUrl(siteLogoRaw) : logoImg;
   const siteLogoAlt = getConfig('site_logo_alt', '');
   // Usar telefone de locação na navbar
   const contactPhoneRaw = getConfig('contact_phone_rental', '');
@@ -113,6 +114,8 @@ const Navbar = () => {
               src={siteLogo}
               alt={siteLogoAlt}
               className="h-11 w-auto rounded-lg"
+              loading="eager"
+              fetchpriority="high"
             />
             {siteLogoAlt && (
               <div className="hidden sm:block">
