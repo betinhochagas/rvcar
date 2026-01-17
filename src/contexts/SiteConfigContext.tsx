@@ -94,21 +94,39 @@ export const SiteConfigProvider: React.FC<SiteConfigProviderProps> = ({ children
 
   // Observar mudanças no favicon e aplicar dinamicamente
   useEffect(() => {
+    console.log('🔍 useEffect favicon disparado. site_favicon:', configs.site_favicon);
+    
     if (configs.site_favicon) {
       const timestamp = new Date().getTime();
       const faviconUrl = configs.site_favicon.includes('?') 
         ? `${configs.site_favicon}&t=${timestamp}`
         : `${configs.site_favicon}?t=${timestamp}`;
       
-      // Atualizar todos os favicons PNG
+      console.log('🖼️ Atualizando favicon para:', faviconUrl);
+      
+      // Atualizar TODOS os favicons (PNG, SVG, qualquer tipo)
       const faviconLinks = document.querySelectorAll('link[rel*="icon"]') as NodeListOf<HTMLLinkElement>;
-      faviconLinks.forEach((link) => {
-        if (link.type === 'image/png' || link.rel === 'apple-touch-icon') {
+      console.log('📌 Encontrados', faviconLinks.length, 'elementos de favicon');
+      
+      faviconLinks.forEach((link, index) => {
+        // Pular apenas o SVG fallback, atualizar todos os outros
+        if (link.type !== 'image/svg+xml') {
+          const oldHref = link.href;
           link.href = faviconUrl;
+          // Forçar o tipo correto baseado na extensão do arquivo
+          const ext = faviconUrl.split('.').pop()?.toLowerCase().split('?')[0];
+          if (ext === 'png') link.type = 'image/png';
+          else if (ext === 'jpg' || ext === 'jpeg') link.type = 'image/jpeg';
+          else if (ext === 'ico') link.type = 'image/x-icon';
+          
+          console.log(`  ✓ [${index}] ${link.rel} atualizado:`, oldHref, '→', link.href);
+        } else {
+          console.log(`  ⊗ [${index}] ${link.rel} (SVG) - mantido como fallback`);
         }
       });
       
       logger.info('Favicon atualizado dinamicamente:', faviconUrl);
+      console.log('✅ Favicon aplicado - verifique a aba do navegador');
     }
   }, [configs.site_favicon]);
 
