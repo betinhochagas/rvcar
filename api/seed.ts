@@ -33,17 +33,20 @@ const INITIAL_VEHICLES: Vehicle[] = [
 ];
 
 const INITIAL_SETTINGS: SiteSettingsData = {
-  site_name: { value: "RV Car Solutions", type: "text", description: "Nome do site" },
-  site_title: { value: "RV Car Solutions - Locação de Veículos", type: "text", description: "Título do site" },
-  site_tagline: { value: "Soluções em locação de veículos", type: "text", description: "Tagline do site" },
-  contact_phone: { value: "(11) 99999-9999", type: "text", description: "Telefone de contato" },
-  contact_whatsapp: { value: "5511999999999", type: "text", description: "WhatsApp de contato" },
-  contact_email: { value: "contato@rvcarsolutions.com.br", type: "text", description: "E-mail de contato" },
-  contact_address: { value: "São Paulo, SP", type: "text", description: "Endereço" },
+  site_name: { value: "RV Car", type: "text", description: "Nome do site" },
+  site_title: { value: "RV Car - Locações e Investimentos", type: "text", description: "Título do site" },
+  site_tagline: { value: "Locações e Investimentos", type: "text", description: "Tagline do site" },
+  contact_phone: { value: "(47)98855-6370", type: "text", description: "Telefone de contato" },
+  contact_phone_rental: { value: "5547988556370", type: "text", description: "Telefone para locação (formato WhatsApp)" },
+  contact_whatsapp_investment: { value: "5547984485492", type: "text", description: "WhatsApp para investimento" },
+  contact_email: { value: "contato@rvlocacoes.com.br", type: "text", description: "E-mail de contato" },
+  contact_address: { value: "Blumenau, SC", type: "text", description: "Endereço" },
   site_logo: { value: "/logo.svg", type: "image", description: "Logo do site" },
   site_favicon: { value: "/favicon.ico", type: "image", description: "Favicon do site" },
-  og_title: { value: "RV Car Solutions - Aluguel de Veículos", type: "text", description: "Título Open Graph" },
-  og_description: { value: "Aluguel de veículos com as melhores condições do mercado.", type: "text", description: "Descrição Open Graph" }
+  og_title: { value: "RV Car - Locações e Investimentos | Aluguel de Carros para App", type: "text", description: "Título Open Graph" },
+  og_description: { value: "Aluguel de carros para motoristas de Uber, 99 e aplicativos em Blumenau SC. Veículos a partir de R$650/semana.", type: "text", description: "Descrição Open Graph" },
+  button_cta_text: { value: "Fale com um consultor", type: "text", description: "Texto do botão CTA principal no Hero" },
+  button_whatsapp_text: { value: "Fale com um consultor", type: "text", description: "Texto do botão WhatsApp flutuante" }
 };
 
 const VEHICLES_FILE = getDataPath('vehicles.json');
