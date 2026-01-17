@@ -200,22 +200,22 @@ const SiteSettings = () => {
       {/* Content */}
       <div className="container mx-auto px-4 py-6 sm:py-8">
         <Tabs defaultValue="branding" className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1">
-            <TabsTrigger value="branding" className="flex flex-col items-center gap-1 py-2 text-xs sm:text-sm">
-              <ImageIcon className="w-4 h-4" />
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+            <TabsTrigger value="branding" className="text-xs sm:text-sm">
+              <ImageIcon className="w-4 h-4 mr-2" />
               <span>Marca</span>
             </TabsTrigger>
-            <TabsTrigger value="og" className="flex flex-col items-center gap-1 py-2 text-xs sm:text-sm">
-              <Globe className="w-4 h-4" />
+            <TabsTrigger value="og" className="text-xs sm:text-sm">
+              <Globe className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Preview Links</span>
               <span className="sm:hidden">Preview</span>
             </TabsTrigger>
-            <TabsTrigger value="contact" className="flex flex-col items-center gap-1 py-2 text-xs sm:text-sm">
-              <Mail className="w-4 h-4" />
+            <TabsTrigger value="contact" className="text-xs sm:text-sm">
+              <Mail className="w-4 h-4 mr-2" />
               <span>Contato</span>
             </TabsTrigger>
-            <TabsTrigger value="social" className="flex flex-col items-center gap-1 py-2 text-xs sm:text-sm">
-              <Share2 className="w-4 h-4" />
+            <TabsTrigger value="social" className="text-xs sm:text-sm">
+              <Share2 className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Redes Sociais</span>
               <span className="sm:hidden">Redes</span>
             </TabsTrigger>
