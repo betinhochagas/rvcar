@@ -97,75 +97,124 @@ export const SiteConfigProvider: React.FC<SiteConfigProviderProps> = ({ children
     console.log('🔍 useEffect favicon disparado. site_favicon:', configs.site_favicon);
     
     if (configs.site_favicon) {
-      const timestamp = new Date().getTime();
-      const faviconUrl = configs.site_favicon.includes('?') 
-        ? `${configs.site_favicon}&t=${timestamp}`
-        : `${configs.site_favicon}?t=${timestamp}`;
-      
-      console.log('🖼️ Atualizando favicon para:', faviconUrl);
-      
-      // ESTRATÉGIA: Remover e recriar links para forçar o navegador a recarregar
-      // Isso é necessário porque navegadores fazem cache agressivo de favicons
-      const head = document.head;
-      const faviconLinks = document.querySelectorAll('link[rel*="icon"]') as NodeListOf<HTMLLinkElement>;
-      console.log('📌 Encontrados', faviconLinks.length, 'elementos de favicon');
-      
-      // Detectar tipo de imagem pela extensão
-      const ext = faviconUrl.split('.').pop()?.toLowerCase().split('?')[0];
-      let mimeType = 'image/png';
-      if (ext === 'jpg' || ext === 'jpeg') mimeType = 'image/jpeg';
-      else if (ext === 'ico') mimeType = 'image/x-icon';
-      else if (ext === 'svg') mimeType = 'image/svg+xml';
-      
-      console.log('🎨 Tipo detectado:', mimeType);
-      
-      // Remover TODOS os favicons não-SVG
-      faviconLinks.forEach((link, index) => {
-        if (link.type !== 'image/svg+xml') {
-          console.log(`  🗑️ [${index}] Removendo ${link.rel} antigo`);
-          link.remove();
-        } else {
-          console.log(`  ⊗ [${index}] ${link.rel} (SVG) - mantido como fallback`);
+      // ESTRATÉGIA DEFINITIVA: Fazer fetch da imagem e criar Blob URL
+      // Isso FORÇA o navegador a baixar uma nova cópia, ignorando TODO cache
+      const updateFavicon = async () => {
+        try {
+          const timestamp = new Date().getTime();
+          
+          // Normalizar URL - em produção, caminho relativo funciona
+          // Em dev, precisa do servidor backend
+          let imageUrl = configs.site_favicon;
+          
+          // Se não for URL absoluta, normalizar
+          if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+            // Em produção, usar caminho relativo
+            if (import.meta.env.PROD) {
+              imageUrl = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+            } else {
+              // Em dev, usar servidor backend
+              const hostname = window.location.hostname;
+              const backendUrl = (hostname === 'localhost' || hostname === '127.0.0.1') 
+                ? 'http://localhost:3000' 
+                : window.location.origin;
+              imageUrl = `${backendUrl}${imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`}`;
+            }
+          }
+          
+          // Adicionar timestamp para cache-busting
+          const fetchUrl = imageUrl.includes('?') 
+            ? `${imageUrl}&t=${timestamp}`
+            : `${imageUrl}?t=${timestamp}`;
+          
+          console.log('🖼️ Fazendo fetch do favicon:', fetchUrl);
+          
+          // Fazer fetch da imagem
+          const response = await fetch(fetchUrl, {
+            method: 'GET',
+            cache: 'no-cache',
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Erro ao carregar favicon: ${response.status} ${response.statusText}`);
+          }
+          
+          // Converter para blob
+          const blob = await response.blob();
+          console.log('📦 Blob criado:', blob.type, blob.size, 'bytes');
+          
+          // Criar Blob URL - isso é uma URL temporária única que NUNCA tem cache
+          const blobUrl = URL.createObjectURL(blob);
+          console.log('🔗 Blob URL criada:', blobUrl);
+          
+          // Remover TODOS os favicons antigos
+          const head = document.head;
+          const faviconLinks = document.querySelectorAll('link[rel*="icon"]') as NodeListOf<HTMLLinkElement>;
+          console.log('📌 Encontrados', faviconLinks.length, 'elementos de favicon');
+          
+          faviconLinks.forEach((link, index) => {
+            console.log(`  🗑️ [${index}] Removendo ${link.rel}: ${link.href}`);
+            
+            // Revogar blob URLs antigas para liberar memória
+            if (link.href.startsWith('blob:')) {
+              URL.revokeObjectURL(link.href);
+            }
+            
+            link.remove();
+          });
+          
+          // Criar novos elementos com Blob URL
+          const mimeType = blob.type || 'image/png';
+          console.log('🎨 Tipo MIME do blob:', mimeType);
+          
+          // 1. Favicon principal 32x32
+          const favicon32 = document.createElement('link');
+          favicon32.rel = 'icon';
+          favicon32.type = mimeType;
+          favicon32.sizes = '32x32';
+          favicon32.href = blobUrl;
+          head.appendChild(favicon32);
+          console.log('  ✅ Criado favicon 32x32');
+          
+          // 2. Favicon 16x16
+          const favicon16 = document.createElement('link');
+          favicon16.rel = 'icon';
+          favicon16.type = mimeType;
+          favicon16.sizes = '16x16';
+          favicon16.href = blobUrl;
+          head.appendChild(favicon16);
+          console.log('  ✅ Criado favicon 16x16');
+          
+          // 3. Apple Touch Icon
+          const appleTouchIcon = document.createElement('link');
+          appleTouchIcon.rel = 'apple-touch-icon';
+          appleTouchIcon.sizes = '180x180';
+          appleTouchIcon.href = blobUrl;
+          head.appendChild(appleTouchIcon);
+          console.log('  ✅ Criado apple-touch-icon');
+          
+          // 4. Shortcut icon (compatibilidade)
+          const shortcut = document.createElement('link');
+          shortcut.rel = 'shortcut icon';
+          shortcut.type = mimeType;
+          shortcut.href = blobUrl;
+          head.appendChild(shortcut);
+          console.log('  ✅ Criado shortcut icon');
+          
+          logger.info('✅ FAVICON ATUALIZADO COM BLOB URL!', blobUrl);
+          console.log('✅✅✅ FAVICON APLICADO COM SUCESSO VIA BLOB URL! Deve aparecer IMEDIATAMENTE.');
+          
+        } catch (error) {
+          console.error('❌ Erro ao atualizar favicon:', error);
+          logger.error('Erro ao atualizar favicon:', error);
         }
-      });
+      };
       
-      // Criar novos links de favicon
-      // 1. Favicon principal 32x32
-      const favicon32 = document.createElement('link');
-      favicon32.rel = 'icon';
-      favicon32.type = mimeType;
-      favicon32.sizes = '32x32';
-      favicon32.href = faviconUrl;
-      head.insertBefore(favicon32, head.firstChild);
-      console.log('  ✅ Criado favicon 32x32:', faviconUrl);
-      
-      // 2. Favicon 16x16
-      const favicon16 = document.createElement('link');
-      favicon16.rel = 'icon';
-      favicon16.type = mimeType;
-      favicon16.sizes = '16x16';
-      favicon16.href = faviconUrl;
-      head.insertBefore(favicon16, head.firstChild);
-      console.log('  ✅ Criado favicon 16x16:', faviconUrl);
-      
-      // 3. Apple Touch Icon
-      const appleTouchIcon = document.createElement('link');
-      appleTouchIcon.rel = 'apple-touch-icon';
-      appleTouchIcon.sizes = '180x180';
-      appleTouchIcon.href = faviconUrl;
-      head.insertBefore(appleTouchIcon, head.firstChild);
-      console.log('  ✅ Criado apple-touch-icon:', faviconUrl);
-      
-      // 4. Shortcut icon (compatibilidade)
-      const shortcut = document.createElement('link');
-      shortcut.rel = 'shortcut icon';
-      shortcut.type = mimeType;
-      shortcut.href = faviconUrl;
-      head.insertBefore(shortcut, head.firstChild);
-      console.log('  ✅ Criado shortcut icon:', faviconUrl);
-      
-      logger.info('Favicon atualizado dinamicamente:', faviconUrl);
-      console.log('✅ Favicon aplicado com sucesso! Novos elementos criados. Force refresh (Ctrl+F5) se não aparecer.');
+      updateFavicon();
     }
   }, [configs.site_favicon]);
 
