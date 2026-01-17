@@ -11,8 +11,8 @@ const Investment = () => {
   const benefits = [
     {
       icon: TrendingUp,
-      title: "Renda Passiva Mensal",
-      description: "Receba rendimentos mensais com a locação dos seus veículos",
+      title: "Renda Semanal",
+      description: "Receba rendimentos semanais com a locação dos seus veículos",
     },
     {
       icon: Shield,

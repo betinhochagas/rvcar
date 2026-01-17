@@ -16,7 +16,13 @@ const VehicleCatalog = () => {
       const loadedVehicles = await getVehicles();
       // Normalizar URLs das imagens para funcionarem via rede local
       const normalizedVehicles = normalizeVehicleImages(loadedVehicles);
-      setVehicles(normalizedVehicles);
+      // Ordenar por preço em ordem decrescente (mais barato primeiro)
+      const sortedVehicles = normalizedVehicles.sort((a, b) => {
+        const priceA = typeof a.price === 'string' ? parseFloat(a.price) : a.price;
+        const priceB = typeof b.price === 'string' ? parseFloat(b.price) : b.price;
+        return priceA - priceB;
+      });
+      setVehicles(sortedVehicles);
     };
     loadVehicles();
   }, []);
@@ -51,7 +57,7 @@ const VehicleCatalog = () => {
 
         <div className="mt-12 text-center">
           <p className="text-muted-foreground mb-4">
-            Todos os valores são por semana. Consulte condições especiais para períodos mais longos.
+            Todos os valores são por semana.
           </p>
         </div>
       </div>
