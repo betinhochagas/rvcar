@@ -87,6 +87,7 @@ async function handlePost(req, res) {
             image: vehicleData.image || '',
             features: vehicleData.features || [],
             available: vehicleData.available !== undefined ? vehicleData.available : true,
+            featured: vehicleData.featured !== undefined ? vehicleData.featured : false,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
         };

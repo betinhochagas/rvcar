@@ -12,6 +12,7 @@ const INITIAL_VEHICLES = [
         image: "/uploads/vehicles/vehicle_default_1.jpeg",
         features: ["Econômico", "Ar Condicionado", "Direção hidráulica", "Seguro"],
         available: true,
+        featured: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
     },
@@ -22,6 +23,7 @@ const INITIAL_VEHICLES = [
         image: "/uploads/vehicles/vehicle_default_2.jpeg",
         features: ["Econômico", "Ar Condicionado", "Direção hidráulica", "Seguro"],
         available: true,
+        featured: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
     }

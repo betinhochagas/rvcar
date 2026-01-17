@@ -53,6 +53,7 @@ export const createVehicleSchema = z.object({
     image: z.string().optional().default(''),
     features: z.array(z.string()).optional().default([]),
     available: booleanSchema.optional().default(true),
+    featured: booleanSchema.optional().default(false),
 });
 /**
  * Schema de Atualização de Veículo
@@ -63,6 +64,7 @@ export const updateVehicleSchema = z.object({
     image: z.string().optional(),
     features: z.array(z.string()).optional(),
     available: booleanSchema.optional(),
+    featured: booleanSchema.optional(),
 });
 /**
  * Schema de Configuração do Site
