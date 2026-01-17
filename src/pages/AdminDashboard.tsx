@@ -166,7 +166,7 @@ const AdminDashboard = () => {
 
     const vehicleData = {
       name: formData.name,
-      price: parseFloat(formData.price),
+      price: formData.price,
       image: formData.image || '/placeholder.svg',
       features: formData.features.split(',').map(f => f.trim()).filter(f => f),
       available: formData.available,

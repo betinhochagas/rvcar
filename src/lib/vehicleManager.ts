@@ -74,6 +74,7 @@ interface RawVehicleData {
   image: string;
   features?: string[];
   available?: boolean | number;
+  featured?: boolean | number;
   created_at?: string;
   createdAt?: string;
   updated_at?: string;
@@ -86,25 +87,42 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
     id: String(v.id), name: v.name, price: v.price, image: v.image,
     features: Array.isArray(v.features) ? v.features : [],
     available: Boolean(v.available),
+    featured: Boolean(v.featured),
     createdAt: v.created_at || v.createdAt || new Date().toISOString(),
     updatedAt: v.updated_at || v.updatedAt || new Date().toISOString(),
   }));
 };
 
 export const addVehicle = async (vehicle: Omit<Vehicle, 'id' | 'createdAt' | 'updatedAt'>): Promise<Vehicle> => {
-  const data = await fetchAPI('/vehicles', {
+  const data = await fetchAPI<RawVehicleData>('/vehicles', {
     method: 'POST',
     body: JSON.stringify({ ...vehicle, available: vehicle.available ?? true }),
   });
-  return { ...data, id: String(data.id), features: data.features || [] };
+  return { 
+    ...data, 
+    id: String(data.id), 
+    features: data.features || [],
+    available: Boolean(data.available),
+    featured: Boolean(data.featured),
+    createdAt: data.created_at || data.createdAt || new Date().toISOString(),
+    updatedAt: data.updated_at || data.updatedAt || new Date().toISOString(),
+  };
 };
 
 export const updateVehicle = async (id: string, updates: Partial<Vehicle>): Promise<Vehicle | null> => {
-  const data = await fetchAPI(`/vehicles/${id}`, {
+  const data = await fetchAPI<RawVehicleData>(`/vehicles/${id}`, {
     method: 'PUT',
     body: JSON.stringify(updates),
   });
-  return { ...data, id: String(data.id), features: data.features || [] };
+  return { 
+    ...data, 
+    id: String(data.id), 
+    features: data.features || [],
+    available: Boolean(data.available),
+    featured: Boolean(data.featured),
+    createdAt: data.created_at || data.createdAt || new Date().toISOString(),
+    updatedAt: data.updated_at || data.updatedAt || new Date().toISOString(),
+  };
 };
 
 export const deleteVehicle = async (id: string): Promise<boolean> => {
@@ -113,6 +131,14 @@ export const deleteVehicle = async (id: string): Promise<boolean> => {
 };
 
 export const toggleVehicleAvailability = async (id: string): Promise<Vehicle | null> => {
-  const data = await fetchAPI(`/vehicles/${id}`, { method: 'PATCH' });
-  return { ...data, id: String(data.id), features: data.features || [] };
+  const data = await fetchAPI<RawVehicleData>(`/vehicles/${id}`, { method: 'PATCH' });
+  return { 
+    ...data, 
+    id: String(data.id), 
+    features: data.features || [],
+    available: Boolean(data.available),
+    featured: Boolean(data.featured),
+    createdAt: data.created_at || data.createdAt || new Date().toISOString(),
+    updatedAt: data.updated_at || data.updatedAt || new Date().toISOString(),
+  };
 };
