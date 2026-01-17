@@ -55,32 +55,11 @@ export const SiteConfigProvider: React.FC<SiteConfigProviderProps> = ({ children
   };
 
   const applyInitialConfigs = (configMap: Record<string, string>) => {
-    // Aplicar título e favicon ANTES de renderizar para evitar flash
-    // Usar site_title se disponível, senão usar site_name
+    // Aplicar apenas título (favicon é gerenciado pelo useEffect)
     if (configMap.site_title) {
       document.title = configMap.site_title;
     } else if (configMap.site_name) {
       document.title = configMap.site_name;
-    }
-    
-    // Atualizar favicon com cache-busting
-    if (configMap.site_favicon) {
-      const timestamp = new Date().getTime();
-      const faviconUrl = configMap.site_favicon.includes('?') 
-        ? `${configMap.site_favicon}&t=${timestamp}`
-        : `${configMap.site_favicon}?t=${timestamp}`;
-      
-      // Atualizar todos os links de favicon PNG (manter SVG intacto como fallback)
-      const faviconLinks = document.querySelectorAll('link[rel*="icon"]') as NodeListOf<HTMLLinkElement>;
-      faviconLinks.forEach((link) => {
-        // Atualizar apenas PNG e apple-touch-icon, preservar SVG
-        if (link.type === 'image/png' || link.rel === 'apple-touch-icon') {
-          link.href = faviconUrl;
-        }
-      });
-      
-      // Log para debug
-      logger.info('Favicon aplicado:', faviconUrl);
     }
   };
 
@@ -113,36 +92,28 @@ export const SiteConfigProvider: React.FC<SiteConfigProviderProps> = ({ children
     loadConfigs();
   }, []);
 
-  // Mostrar loader enquanto carrega configurações críticas
-  if (loading) {
-    return (
-      <div style={{ 
-        position: 'fixed', 
-        inset: 0, 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        backgroundColor: '#ffffff',
-        zIndex: 9999
-      }}>
-        <div style={{
-          width: '40px',
-          height: '40px',
-          border: '4px solid #f3f4f6',
-          borderTop: '4px solid #3b82f6',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite'
-        }} />
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
-      </div>
-    );
-  }
+  // Observar mudanças no favicon e aplicar dinamicamente
+  useEffect(() => {
+    if (configs.site_favicon) {
+      const timestamp = new Date().getTime();
+      const faviconUrl = configs.site_favicon.includes('?') 
+        ? `${configs.site_favicon}&t=${timestamp}`
+        : `${configs.site_favicon}?t=${timestamp}`;
+      
+      // Atualizar todos os favicons PNG
+      const faviconLinks = document.querySelectorAll('link[rel*="icon"]') as NodeListOf<HTMLLinkElement>;
+      faviconLinks.forEach((link) => {
+        if (link.type === 'image/png' || link.rel === 'apple-touch-icon') {
+          link.href = faviconUrl;
+        }
+      });
+      
+      logger.info('Favicon atualizado dinamicamente:', faviconUrl);
+    }
+  }, [configs.site_favicon]);
 
+  // NÃO bloquear renderização durante carregamento
+  // Isso permite que a logo padrão apareça imediatamente
   return (
     <SiteConfigContext.Provider value={{ configs, loading, error, getConfig, refreshConfigs }}>
       {children}
