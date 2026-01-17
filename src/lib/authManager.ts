@@ -165,7 +165,13 @@ export const logout = async (): Promise<void> => {
  * Obter token armazenado
  */
 export const getToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEY);
+  try {
+    return localStorage.getItem(TOKEN_KEY);
+  } catch (error) {
+    // Safari pode bloquear localStorage em modo privado ou cross-origin
+    console.error('Erro ao acessar localStorage:', error);
+    return null;
+  }
 };
 
 /**

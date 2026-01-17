@@ -159,21 +159,20 @@ export async function deleteSiteSetting(key: string): Promise<void> {
  */
 export async function saveBulkSettings(configs: SiteConfigForm[]): Promise<SiteConfig[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/site-settings`, {
+    const response = await fetchWithRetry<{ data: SiteConfig[] }>(`${API_BASE_URL}/site-settings`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...getAuthHeader(),
       },
       body: JSON.stringify(configs),
+    }, {
+      retries: 3,
+      backoff: 1000,
+      retryOn: [408, 429, 500, 502, 503, 504]
     });
     
-    if (!response.ok) {
-      throw new Error(`Erro ao salvar configurações: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
-    return data.data || configs;
+    return response.data || configs;
   } catch (error) {
     logger.error('Erro ao salvar configurações em lote:', error);
     throw error;
