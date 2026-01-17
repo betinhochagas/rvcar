@@ -19,7 +19,7 @@ const VehicleCard = ({ name, price, image, features, available = true, onRequest
   };
 
   return (
-    <Card className="overflow-hidden border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group">
+    <Card className="overflow-hidden border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group flex flex-col h-full">
       <div className="aspect-[4/3] overflow-hidden bg-muted relative">
         <img
           src={image}
@@ -40,8 +40,8 @@ const VehicleCard = ({ name, price, image, features, available = true, onRequest
           </div>
         )}
       </div>
-      <CardContent className="p-6">
-        <h3 className="text-2xl font-bold mb-2">{name}</h3>
+      <CardContent className="p-6 flex-grow">
+        <h3 className="text-2xl font-bold mb-2 min-h-[3.5rem] flex items-center">{name}</h3>
         <div className="flex items-baseline gap-2 mb-4">
           <span className="text-3xl font-bold text-primary">R${price}</span>
           <span className="text-muted-foreground">/semana</span>
