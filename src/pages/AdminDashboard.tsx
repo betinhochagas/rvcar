@@ -59,6 +59,7 @@ const AdminDashboard = () => {
     image: '',
     features: '',
     available: true,
+    featured: false,
   });
 
   const loadVehicles = useCallback(async () => {
@@ -97,6 +98,7 @@ const AdminDashboard = () => {
       image: '',
       features: '',
       available: true,
+      featured: false,
     });
     setImagePreview(null);
     setIsEditDialogOpen(true);
@@ -110,6 +112,7 @@ const AdminDashboard = () => {
       image: vehicle.image,
       features: vehicle.features.join(', '),
       available: vehicle.available,
+      featured: vehicle.featured || false,
     });
     // Normalizar URL da imagem para preview
     setImagePreview(getAbsoluteImageUrl(vehicle.image));
@@ -167,6 +170,7 @@ const AdminDashboard = () => {
       image: formData.image || '/placeholder.svg',
       features: formData.features.split(',').map(f => f.trim()).filter(f => f),
       available: formData.available,
+      featured: formData.featured,
     };
 
     try {
@@ -461,6 +465,19 @@ const AdminDashboard = () => {
               />
               <Label htmlFor="available">
                 {formData.available ? 'Veículo Disponível' : 'Veículo Indisponível'}
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="featured"
+                checked={formData.featured}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, featured: checked })
+                }
+              />
+              <Label htmlFor="featured">
+                {formData.featured ? '⭐ Veículo em Destaque' : 'Marcar como Destaque'}
               </Label>
             </div>
           </div>

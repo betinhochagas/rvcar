@@ -117,6 +117,7 @@ async function handlePut(req: VercelRequest, res: VercelResponse, id: number) {
     if (updates.image !== undefined) vehicle.image = updates.image;
     if (updates.features !== undefined) vehicle.features = updates.features;
     if (updates.available !== undefined) vehicle.available = updates.available;
+    if (updates.featured !== undefined) vehicle.featured = updates.featured;
     
     vehicle.updated_at = new Date().toISOString();
 

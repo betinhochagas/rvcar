@@ -1,6 +1,6 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Check, Star } from "lucide-react";
 
 interface VehicleCardProps {
   name: string;
@@ -8,10 +8,11 @@ interface VehicleCardProps {
   image: string;
   features: string[];
   available?: boolean;
+  featured?: boolean;
   onRequestQuote?: (vehicleName: string, vehiclePrice: string) => void;
 }
 
-const VehicleCard = ({ name, price, image, features, available = true, onRequestQuote }: VehicleCardProps) => {
+const VehicleCard = ({ name, price, image, features, available = true, featured = false, onRequestQuote }: VehicleCardProps) => {
   const handleRequestQuote = () => {
     if (onRequestQuote) {
       onRequestQuote(name, price);
@@ -19,8 +20,16 @@ const VehicleCard = ({ name, price, image, features, available = true, onRequest
   };
 
   return (
-    <Card className="overflow-hidden border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group flex flex-col h-full">
+    <Card className={`overflow-hidden border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group flex flex-col h-full ${
+      featured ? 'ring-2 ring-primary shadow-lg shadow-primary/20' : ''
+    }`}>
       <div className="aspect-[4/3] overflow-hidden bg-muted relative">
+        {featured && (
+          <div className="absolute top-3 right-3 z-10 bg-primary text-primary-foreground px-3 py-1 rounded-full flex items-center gap-1 font-semibold text-sm shadow-lg">
+            <Star className="h-4 w-4 fill-current" />
+            Destaque
+          </div>
+        )}
         <img
           src={image}
           alt={name}

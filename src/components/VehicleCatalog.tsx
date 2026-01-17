@@ -16,8 +16,13 @@ const VehicleCatalog = () => {
       const loadedVehicles = await getVehicles();
       // Normalizar URLs das imagens para funcionarem via rede local
       const normalizedVehicles = normalizeVehicleImages(loadedVehicles);
-      // Ordenar por preço em ordem decrescente (mais barato primeiro)
+      // Ordenar: primeiro por destaque (featured), depois por preço
       const sortedVehicles = normalizedVehicles.sort((a, b) => {
+        // Se um é destaque e o outro não, destaque vem primeiro
+        if (a.featured && !b.featured) return -1;
+        if (!a.featured && b.featured) return 1;
+        
+        // Se ambos têm o mesmo status de destaque, ordenar por preço
         const priceA = typeof a.price === 'string' ? parseFloat(a.price) : a.price;
         const priceB = typeof b.price === 'string' ? parseFloat(b.price) : b.price;
         return priceA - priceB;
