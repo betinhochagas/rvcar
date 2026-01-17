@@ -43,8 +43,11 @@
     
     <!-- Critical CSS - estilos mínimos para renderização inicial -->
     <style>
-      body{margin:0;font-family:Inter,system-ui,sans-serif;background:#fafafa}
+      *{box-sizing:border-box}
+      body{margin:0;font-family:Inter,system-ui,sans-serif;background:#fafafa;line-height:1.5}
       .hero-placeholder{min-height:100vh;background:#1a1a1a}
+      img{max-width:100%;height:auto;display:block}
+      button,a{cursor:pointer}
     </style>
     
     <!-- Preload da imagem do Hero (LCP) -->
@@ -55,6 +58,7 @@
     <!-- Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://rvcar-production.up.railway.app" />
     
     <!-- Fontes carregadas de forma assíncrona para não bloquear renderização -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />

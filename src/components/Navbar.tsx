@@ -116,6 +116,8 @@ const Navbar = () => {
               className="h-11 w-auto rounded-lg"
               loading="eager"
               fetchpriority="high"
+              width={44}
+              height={44}
             />
             {siteLogoAlt && (
               <div className="hidden sm:block">

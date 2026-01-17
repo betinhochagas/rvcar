@@ -52,6 +52,9 @@ const Footer = () => {
                 src={siteLogo}
                 alt={siteLogoAlt}
                 className="h-12 w-auto"
+                loading="lazy"
+                width={48}
+                height={48}
               />
               <div className="flex flex-col">
                 {siteLogoAlt && (
