@@ -150,9 +150,8 @@ export const logout = async (): Promise<void> => {
           'Authorization': `Bearer ${token}`
         },
       });
-    } catch (error) {
-      console.error('Erro ao fazer logout no servidor:', error);
-      // Continue com logout local mesmo se falhar
+    } catch {
+      // Silenciar erro - continue com logout local mesmo se falhar no servidor
     }
   }
   

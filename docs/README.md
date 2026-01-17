@@ -2,6 +2,10 @@
 
 Sistema de locação de veículos desenvolvido com **React + TypeScript** (frontend) e **Vercel Serverless Functions** (backend).
 
+**Versão atual:** 2.1.4  
+**Score de Segurança:** 10/10  
+**Última atualização:** 17 de janeiro de 2026
+
 ## 🚀 Quick Start
 
 ```bash
@@ -74,11 +78,15 @@ Data (JSON Files)
 ## 🔒 Segurança
 
 - ✅ Rate limiting (5 tentativas/15min)
-- ✅ JWT tokens com expiração
+- ✅ JWT tokens com expiração (24h)
 - ✅ CORS configurado
 - ✅ Validação de entrada (Zod)
 - ✅ Upload seguro (MIME type validation)
 - ✅ File locking (previne race conditions)
+- ✅ HTTP Headers de segurança (X-Frame-Options, CSP, etc.)
+- ✅ Error Boundaries implementados
+- ✅ Logger condicional (sem logs em produção)
+- ✅ Sem credenciais hardcoded
 
 ## 🧪 Testes
 

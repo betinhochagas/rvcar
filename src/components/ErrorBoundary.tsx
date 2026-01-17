@@ -28,9 +28,6 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log para console em desenvolvimento
-    console.error('ErrorBoundary capturou erro:', error, errorInfo);
-    
     this.setState({ errorInfo });
     
     // Em produção, enviar para serviço de logging
@@ -47,7 +44,7 @@ class ErrorBoundary extends Component<Props, State> {
           url: window.location.href,
           userAgent: navigator.userAgent,
         }),
-      }).catch(console.error);
+      }).catch(() => { /* Silenciar erros de log */ });
     }
   }
 

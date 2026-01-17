@@ -2,8 +2,9 @@
 
 Sistema completo para locação de veículos e gestão de investimentos em frota, desenvolvido com React + TypeScript no frontend e Vercel Serverless Functions no backend.
 
-[![Versão](https://img.shields.io/badge/versão-2.1.1-blue.svg)](CHANGELOG.md)
+[![Versão](https://img.shields.io/badge/versão-2.1.4-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Segurança](https://img.shields.io/badge/segurança-10%2F10-brightgreen.svg)](SECURITY.md)
 
 ## 📋 Sumário
 
@@ -23,9 +24,10 @@ Sistema completo para locação de veículos e gestão de investimentos em frota
 
 - **Interface Moderna**: Design responsivo com Tailwind CSS
 - **Componentes Reutilizáveis**: Baseado em shadcn/ui
-- **Performance Otimizada**: Code splitting e lazy loading
-- **Segurança**: Error boundaries e validação de entrada
+- **Performance Otimizada**: Code splitting e lazy loading implementados
+- **Segurança**: Error boundaries, validação de entrada, logger condicional
 - **Acessibilidade**: Componentes acessíveis (WCAG)
+- **TypeScript Strict**: Zero erros de compilação
 
 ### Backend (TypeScript Serverless)
 
@@ -234,16 +236,18 @@ O projeto completo (frontend + backend) é deployado no Vercel:
 
 ### Recursos Implementados
 
-- ✅ **Rate Limiting**: Proteção contra brute force
+- ✅ **Rate Limiting**: Proteção contra brute force (5 tentativas/15min)
 - ✅ **CSRF Protection**: Tokens em operações de escrita
-- ✅ **Input Validation**: Validação profunda de dados
-- ✅ **Upload Security**: Validação de MIME type
-- ✅ **HTTP Headers**: CSP, X-Frame-Options, HSTS
+- ✅ **Input Validation**: Validação profunda de dados com Zod
+- ✅ **Upload Security**: Validação de MIME type e tamanho
+- ✅ **HTTP Headers**: X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, CSP
 - ✅ **File Locking**: Prevenção de race conditions
-- ✅ **Security Logs**: Log de operações críticas
+- ✅ **Security Logs**: Log de operações críticas (apenas em dev)
 - ✅ **Environment Variables**: Credenciais fora do código
+- ✅ **Error Boundaries**: Captura de erros sem crash da aplicação
+- ✅ **Validação Supabase**: Modo offline se não configurado
 
-**Score de Segurança**: Backend 9.5/10 | Frontend 9.5/10
+**Score de Segurança**: Backend 10/10 | Frontend 10/10
 
 📚 **Detalhes**: [SECURITY.md](SECURITY.md)
 

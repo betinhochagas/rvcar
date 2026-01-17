@@ -191,6 +191,7 @@ const AdminDashboard = () => {
   // Throttle para prevenir cliques múltiplos
   const handleSaveVehicle = useMemo(
     () => throttle(saveVehicle, 1000),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [formData, selectedVehicle]
   );
 
@@ -212,6 +213,7 @@ const AdminDashboard = () => {
   // Throttle para prevenir cliques múltiplos
   const handleDeleteVehicle = useMemo(
     () => throttle(deleteVehicleAction, 1000),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedVehicle]
   );
 

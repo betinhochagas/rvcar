@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -47,14 +47,7 @@ const RentalModal = ({ open, onOpenChange, selectedVehicle }: RentalModalProps) 
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
-  // Carregar veículos disponíveis quando não há veículo pré-selecionado
-  useEffect(() => {
-    if (open && !selectedVehicle) {
-      loadVehicles();
-    }
-  }, [open, selectedVehicle]);
-
-  const loadVehicles = async () => {
+  const loadVehicles = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getVehicles();
@@ -78,7 +71,14 @@ const RentalModal = ({ open, onOpenChange, selectedVehicle }: RentalModalProps) 
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  // Carregar veículos disponíveis quando não há veículo pré-selecionado
+  useEffect(() => {
+    if (open && !selectedVehicle) {
+      loadVehicles();
+    }
+  }, [open, selectedVehicle, loadVehicles]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

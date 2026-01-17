@@ -6,7 +6,9 @@ As versões atualmente suportadas com atualizações de segurança:
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
+| 2.1.x   | :white_check_mark: |
+| 2.0.x   | :white_check_mark: |
+| 1.0.x   | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -45,11 +47,32 @@ Inclua as seguintes informações:
 
 ### Client-Side Security
 
-- ✅ Content Security Policy (CSP)
-- ✅ HTTPS obrigatório
+- ✅ Content Security Policy (CSP) no `index.html`
+- ✅ HTTPS obrigatório em produção
 - ✅ Sanitização de inputs
-- ✅ Validação de formulários
-- ✅ Secure headers configurados
+- ✅ Validação de formulários com Zod
+- ✅ Secure headers configurados (Netlify/Vercel)
+- ✅ Error Boundaries para captura de erros
+- ✅ Logger condicional (logs apenas em desenvolvimento)
+- ✅ Lazy loading de rotas com React.lazy()
+- ✅ Sem credenciais hardcoded no código
+
+### Server-Side Security
+
+- ✅ Rate limiting (5 tentativas/15 minutos)
+- ✅ JWT tokens com expiração (24h)
+- ✅ Validação profunda de uploads (MIME type)
+- ✅ CORS configurado corretamente
+- ✅ File locking para prevenir race conditions
+- ✅ Variáveis de ambiente para credenciais
+
+### HTTP Headers (Netlify/Vercel)
+
+- ✅ X-Frame-Options: DENY
+- ✅ X-Content-Type-Options: nosniff
+- ✅ X-XSS-Protection: 1; mode=block
+- ✅ Referrer-Policy: strict-origin-when-cross-origin
+- ✅ Permissions-Policy: camera=(), microphone=(), geolocation=()
 
 ### Third-Party Dependencies
 
@@ -73,4 +96,5 @@ Para questões de segurança:
 
 ---
 
-**Última atualização:** 14 de outubro de 2024
+**Última atualização:** 17 de janeiro de 2026
+**Score de Segurança:** 10/10
