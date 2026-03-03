@@ -31,6 +31,17 @@ export function getAbsoluteImageUrl(relativePath: string): string {
     return path;
   }
 
+  // Se VITE_API_URL estiver definido (ex: .env.local apontando para Railway),
+  // extrair a origem (protocolo + host) para montar a URL da imagem
+  if (import.meta.env.VITE_API_URL) {
+    try {
+      const { origin } = new URL(import.meta.env.VITE_API_URL);
+      return `${origin}${path}`;
+    } catch {
+      // URL inválida, continua para o fallback
+    }
+  }
+
   // Em desenvolvimento, detectar o tipo de acesso
   const hostname = window.location.hostname;
 
