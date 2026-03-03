@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gerador de Logo Placeholder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f3f4f6;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-size: 1rem;
+        }
+        .btn:hover {
+            background: #5568d3;
+        }
+        input {
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            width: 200px;
+            margin: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Gerador de Logo Placeholder</h1>
+        <p>Crie uma logo genérica para seu projeto</p>
+        
+        <div>
+            <input type="text" id="logoText" value="LOGO" placeholder="Texto da Logo">
+            <input type="color" id="bgColor" value="#667eea" title="Cor de fundo">
+            <input type="color" id="textColor" value="#ffffff" title="Cor do texto">
+        </div>
+        
+        <canvas id="canvas" width="400" height="400"></canvas>
+        
+        <div>
+            <button class="btn" onclick="generateLogo()">Gerar Logo</button>
+            <button class="btn" onclick="downloadPNG('logo')">Baixar Logo (400x400)</button>
+            <button class="btn" onclick="downloadFavicon()">Baixar Favicon (64x64)</button>
+        </div>
+        
+        <p style="color: #6b7280; font-size: 0.875rem;">
+            As imagens serão salvas automaticamente na pasta de Downloads
+        </p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        function generateLogo() {
+            const text = document.getElementById('logoText').value || 'LOGO';
+            const bgColor = document.getElementById('bgColor').value;
+            const textColor = document.getElementById('textColor').value;
+            
+            // Limpar canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Fundo com gradiente
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, bgColor);
+            gradient.addColorStop(1, adjustColor(bgColor, -20));
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Formas decorativas
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.beginPath();
+            ctx.arc(100, 100, 80, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(300, 300, 100, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Texto
+            ctx.fillStyle = textColor;
+            ctx.font = 'bold 72px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+            
+            // Subtexto
+            ctx.font = '20px Arial';
+            ctx.fillText('Sua Empresa', canvas.width / 2, canvas.height / 2 + 60);
+        }
+        
+        function adjustColor(color, amount) {
+            const num = parseInt(color.replace('#', ''), 16);
+            const r = Math.max(0, Math.min(255, (num >> 16) + amount));
+            const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount));
+            const b = Math.max(0, Math.min(255, (num & 0x0000FF) + amount));
+            return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+        }
+        
+        function downloadPNG(filename) {
+            const link = document.createElement('a');
+            link.download = filename + '.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        function downloadFavicon() {
+            // Criar canvas menor para favicon
+            const smallCanvas = document.createElement('canvas');
+            smallCanvas.width = 64;
+            smallCanvas.height = 64;
+            const smallCtx = smallCanvas.getContext('2d');
+            
+            // Copiar imagem reduzida
+            smallCtx.drawImage(canvas, 0, 0, 64, 64);
+            
+            const link = document.createElement('a');
+            link.download = 'favicon.png';
+            link.href = smallCanvas.toDataURL();
+            link.click();
+        }
+        
+        // Gerar logo inicial
+        generateLogo();
+        
+        // Atualizar ao mudar inputs
+        document.getElementById('logoText').addEventListener('input', generateLogo);
+        document.getElementById('bgColor').addEventListener('change', generateLogo);
+        document.getElementById('textColor').addEventListener('change', generateLogo);
+    </script>
+</body>
+</html>
