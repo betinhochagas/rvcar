@@ -24,16 +24,27 @@ export function getCorsHeaders(req: VercelRequest): CorsHeaders {
     'Access-Control-Max-Age': '86400',
   };
 
+  // Origens externas sempre permitidas
+  const externalAllowedOrigins = [
+    'https://rvcar.vercel.app',
+    'https://www.rvcarlocacoes.com.br',
+    'http://www.rvcarlocacoes.com.br',
+  ];
+
   if (isProduction) {
-    // Produção: apenas permitir origem do próprio domínio
+    // Produção: permitir origem do próprio domínio + origens externas
     const protocol = (req.headers['x-forwarded-proto'] as string) || 'https';
     const allowedOrigins = [
       `${protocol}://${host}`,
       `https://${host}`,
       `http://${host}`,
+      ...externalAllowedOrigins,
     ];
 
-    if (origin && allowedOrigins.includes(origin)) {
+    // Também permitir localhost para desenvolvimento remoto
+    const isLocalOrigin = origin.match(/^https?:\/\/localhost(:\d+)?$/);
+
+    if (origin && (allowedOrigins.includes(origin) || isLocalOrigin)) {
       headers['Access-Control-Allow-Origin'] = origin;
       headers['Access-Control-Allow-Credentials'] = 'true';
     } else {
