@@ -47,17 +47,20 @@
       (function() {
         const hostname = window.location.hostname;
         let apiUrl;
+
+        // Vite substitui %VITE_API_URL% pelo valor real do .env.local em dev
+        // e pelo valor do ambiente em build. Se não estiver definido, fica como string literal.
+        var envApiUrl = '%VITE_API_URL%';
         
-        // Detectar ambiente e definir URL da API
-        if (hostname === 'localhost' || hostname === '127.0.0.1') {
-          // Acessando via localhost
-          apiUrl = 'http://localhost:3000/api/site-settings';
+        if (envApiUrl && envApiUrl.indexOf('%') === -1) {
+          // Variável de ambiente configurada (dev com .env.local ou build)
+          apiUrl = envApiUrl + '/site-settings';
+        } else if (window.location.protocol === 'https:' || hostname.indexOf('.') > -1 && hostname.indexOf('localhost') === -1) {
+          // Produção (HTTPS ou domínio real) - usar URL relativa
+          apiUrl = '/api/site-settings';
         } else if (hostname.match(/^(192\.168\.|10\.)/)) {
           // Acessando via IP da rede local - usar o mesmo IP
-          apiUrl = `http://${hostname}:3000/api/site-settings`;
-        } else if (window.location.protocol === 'https:') {
-          // Produção (HTTPS) - usar URL relativa
-          apiUrl = '/api/site-settings';
+          apiUrl = 'http://' + hostname + ':3000/api/site-settings';
         } else {
           // Fallback para localhost
           apiUrl = 'http://localhost:3000/api/site-settings';
