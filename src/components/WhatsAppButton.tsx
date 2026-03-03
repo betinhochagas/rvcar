@@ -10,7 +10,7 @@ const WhatsAppButton = () => {
   const { getConfig } = useSiteConfig();
   
   // Configurações dinâmicas
-  const buttonText = getConfig('button_whatsapp_text', '');
+  const buttonText = getConfig('button_whatsapp_text', 'Fale Conosco');
 
   useEffect(() => {
     // Verifica se o usuário já fechou o botão anteriormente (sessão)

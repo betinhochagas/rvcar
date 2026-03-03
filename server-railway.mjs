@@ -131,10 +131,17 @@ app.post('/api/auth', async (req, res) => {
 });
 
 // Rotas de compatibilidade (redirecionam para ?action=xxx)
-app.post('/api/auth/login', (req, res) => {
-  req.query.action = 'login';
-  req.originalUrl = '/api/auth?action=login';
-  return app._router.handle({ ...req, url: '/api/auth', query: { action: 'login' } }, res, () => {});
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    req.query.action = 'login';
+    const handler = await loadHandler('auth');
+    const { vercelReq, vercelRes } = createVercelMocks(req, res);
+    vercelReq.query = { action: 'login' };
+    await handler(vercelReq, vercelRes);
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 app.post('/api/auth/logout', async (req, res) => {

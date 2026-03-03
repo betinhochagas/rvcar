@@ -13,8 +13,8 @@ const Hero = () => {
   const { getConfig } = useSiteConfig();
   
   // Configurações dinâmicas
-  const siteName = getConfig('site_name', '');
-  const buttonCtaText = getConfig('button_cta_text', '');
+  const siteName = getConfig('site_name', 'RVCar');
+  const buttonCtaText = getConfig('button_cta_text', 'Fale com um Consultor');
 
   // Buscar menor preço dos veículos
   useEffect(() => {
