@@ -84,7 +84,7 @@ export async function deleteData(key) {
  */
 export async function checkStorage() {
     try {
-        const dataDir = path.join(process.cwd(), 'data');
+        const dataDir = path.join(STORAGE_BASE, 'data');
         await fs.mkdir(dataDir, { recursive: true });
         // Testar escrita
         const testFile = path.join(dataDir, '.storage-test');

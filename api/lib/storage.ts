@@ -98,7 +98,7 @@ export async function checkStorage(): Promise<{
   message: string;
 }> {
   try {
-    const dataDir = path.join(process.cwd(), 'data');
+    const dataDir = path.join(STORAGE_BASE, 'data');
     await fs.mkdir(dataDir, { recursive: true });
     
     // Testar escrita
