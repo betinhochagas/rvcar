@@ -6,6 +6,7 @@ export interface Vehicle {
   image: string;
   features: string[];
   available: boolean;
+  featured: boolean;
   createdAt: string;
   updatedAt: string;
 }

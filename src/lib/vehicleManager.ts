@@ -74,6 +74,7 @@ interface RawVehicleData {
   image: string;
   features?: string[];
   available?: boolean | number;
+  featured?: boolean;
   created_at?: string;
   createdAt?: string;
   updated_at?: string;
@@ -86,6 +87,7 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
     id: String(v.id), name: v.name, price: v.price, image: v.image,
     features: Array.isArray(v.features) ? v.features : [],
     available: Boolean(v.available),
+    featured: Boolean(v.featured),
     createdAt: v.created_at || v.createdAt || new Date().toISOString(),
     updatedAt: v.updated_at || v.updatedAt || new Date().toISOString(),
   }));

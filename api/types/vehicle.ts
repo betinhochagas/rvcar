@@ -6,6 +6,7 @@ export interface Vehicle {
   image: string;
   features: string[];
   available: boolean;
+  featured: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -16,6 +17,7 @@ export interface CreateVehicleRequest {
   image?: string;
   features?: string[];
   available?: boolean;
+  featured?: boolean;
 }
 
 export interface UpdateVehicleRequest {
@@ -24,4 +26,5 @@ export interface UpdateVehicleRequest {
   image?: string;
   features?: string[];
   available?: boolean;
+  featured?: boolean;
 }

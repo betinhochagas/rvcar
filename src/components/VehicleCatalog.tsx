@@ -16,7 +16,15 @@ const VehicleCatalog = () => {
       const loadedVehicles = await getVehicles();
       // Normalizar URLs das imagens para funcionarem via rede local
       const normalizedVehicles = normalizeVehicleImages(loadedVehicles);
-      setVehicles(normalizedVehicles);
+      // Ordenar: destaques primeiro, depois por preço crescente
+      const sorted = [...normalizedVehicles].sort((a, b) => {
+        if (a.featured && !b.featured) return -1;
+        if (!a.featured && b.featured) return 1;
+        const pa = parseFloat(String(a.price).replace(/[^\d.]/g, '')) || 0;
+        const pb = parseFloat(String(b.price).replace(/[^\d.]/g, '')) || 0;
+        return pa - pb;
+      });
+      setVehicles(sorted);
     };
     loadVehicles();
   }, []);
@@ -42,9 +50,9 @@ const VehicleCatalog = () => {
           {vehicles.map((vehicle) => (
             <div
               key={vehicle.id}
-              className="animate-fade-in"
+              className="animate-fade-in h-full"
             >
-              <VehicleCard {...vehicle} onRequestQuote={handleRequestQuote} />
+              <VehicleCard {...vehicle} featured={vehicle.featured} onRequestQuote={handleRequestQuote} />
             </div>
           ))}
         </div>

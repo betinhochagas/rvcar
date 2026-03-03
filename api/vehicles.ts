@@ -46,6 +46,13 @@ async function handleGet(req: VercelRequest, res: VercelResponse) {
       filteredVehicles = vehicles.filter((v: Vehicle) => v.available === true);
     }
 
+    // Ordenar: destaques primeiro, depois por preço crescente
+    filteredVehicles = [...filteredVehicles].sort((a, b) => {
+      if (a.featured && !b.featured) return -1;
+      if (!a.featured && b.featured) return 1;
+      return (a.price ?? 0) - (b.price ?? 0);
+    });
+
     return sendResponse(res, req, filteredVehicles, 200);
   } catch (error) {
     console.error('Erro ao listar veículos:', error);
@@ -108,6 +115,7 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
       image: vehicleData.image || '',
       features: vehicleData.features || [],
       available: vehicleData.available !== undefined ? vehicleData.available : true,
+      featured: vehicleData.featured !== undefined ? vehicleData.featured : false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };

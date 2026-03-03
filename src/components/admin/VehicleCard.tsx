@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Star } from 'lucide-react';
 import { Vehicle } from '@/types/admin';
 
 interface VehicleCardProps {
@@ -28,6 +28,12 @@ const VehicleCard = memo(({ vehicle, onEdit, onDelete, onToggleAvailability }: V
             !vehicle.available ? 'grayscale opacity-60' : ''
           }`}
         />
+        {vehicle.featured && (
+          <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+            <Star className="h-3 w-3 fill-current" />
+            Destaque
+          </div>
+        )}
         {!vehicle.available && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50">
             <span className="text-white font-bold text-lg">INDISPONÍVEL</span>

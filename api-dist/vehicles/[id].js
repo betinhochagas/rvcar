@@ -100,6 +100,8 @@ async function handlePut(req, res, id) {
             vehicle.features = updates.features;
         if (updates.available !== undefined)
             vehicle.available = updates.available;
+        if (updates.featured !== undefined)
+            vehicle.featured = updates.featured;
         vehicle.updated_at = new Date().toISOString();
         await writeJsonFile(VEHICLES_FILE, vehicles, 0o600);
         // Log da operação

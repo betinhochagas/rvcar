@@ -1,6 +1,6 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Check, Star } from "lucide-react";
 
 interface VehicleCardProps {
   name: string;
@@ -8,10 +8,11 @@ interface VehicleCardProps {
   image: string;
   features: string[];
   available?: boolean;
+  featured?: boolean;
   onRequestQuote?: (vehicleName: string, vehiclePrice: string) => void;
 }
 
-const VehicleCard = ({ name, price, image, features, available = true, onRequestQuote }: VehicleCardProps) => {
+const VehicleCard = ({ name, price, image, features, available = true, featured = false, onRequestQuote }: VehicleCardProps) => {
   const handleRequestQuote = () => {
     if (onRequestQuote) {
       onRequestQuote(name, price);
@@ -19,7 +20,7 @@ const VehicleCard = ({ name, price, image, features, available = true, onRequest
   };
 
   return (
-    <Card className="overflow-hidden border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group">
+    <Card className={`overflow-hidden border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group flex flex-col h-full ${featured ? 'ring-2 ring-primary' : ''}`}>
       <div className="aspect-[4/3] overflow-hidden bg-muted relative">
         <img
           src={image}
@@ -28,6 +29,12 @@ const VehicleCard = ({ name, price, image, features, available = true, onRequest
             !available ? "grayscale opacity-60" : ""
           }`}
         />
+        {featured && (
+          <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+            <Star className="h-3 w-3 fill-current" />
+            Destaque
+          </div>
+        )}
         {!available && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60">
             <span className="text-white font-bold text-lg px-4 py-2 bg-red-600 rounded">
@@ -36,13 +43,13 @@ const VehicleCard = ({ name, price, image, features, available = true, onRequest
           </div>
         )}
       </div>
-      <CardContent className="p-6">
-        <h3 className="text-2xl font-bold mb-2">{name}</h3>
+      <CardContent className="p-6 flex flex-col flex-1">
+        <h3 className="text-2xl font-bold mb-2 min-h-[3.5rem] line-clamp-2">{name}</h3>
         <div className="flex items-baseline gap-2 mb-4">
           <span className="text-3xl font-bold text-primary">R${price}</span>
           <span className="text-muted-foreground">/semana</span>
         </div>
-        <ul className="space-y-2">
+        <ul className="space-y-2 flex-1">
           {features.map((feature, index) => (
             <li key={index} className="flex items-center text-sm text-muted-foreground">
               <Check className="h-4 w-4 text-primary mr-2 flex-shrink-0" />

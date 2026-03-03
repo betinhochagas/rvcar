@@ -25,7 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Edit, Trash2, LogOut, Car, Home, Upload, X } from 'lucide-react';
+import { Plus, Edit, Trash2, LogOut, Car, Home, Upload, X, Star } from 'lucide-react';
 import { Vehicle } from '@/types/admin';
 import {
   getVehicles,
@@ -59,6 +59,7 @@ const AdminDashboard = () => {
     image: '',
     features: '',
     available: true,
+    featured: false,
   });
 
   const loadVehicles = useCallback(async () => {
@@ -97,6 +98,7 @@ const AdminDashboard = () => {
       image: '',
       features: '',
       available: true,
+      featured: false,
     });
     setImagePreview(null);
     setIsEditDialogOpen(true);
@@ -110,6 +112,7 @@ const AdminDashboard = () => {
       image: vehicle.image,
       features: vehicle.features.join(', '),
       available: vehicle.available,
+      featured: vehicle.featured ?? false,
     });
     // Normalizar URL da imagem para preview
     setImagePreview(getAbsoluteImageUrl(vehicle.image));
@@ -167,6 +170,7 @@ const AdminDashboard = () => {
       image: formData.image || '/placeholder.svg',
       features: formData.features.split(',').map(f => f.trim()).filter(f => f),
       available: formData.available,
+      featured: formData.featured,
     };
 
     try {
@@ -459,6 +463,20 @@ const AdminDashboard = () => {
               />
               <Label htmlFor="available">
                 {formData.available ? 'Veículo Disponível' : 'Veículo Indisponível'}
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="featured"
+                checked={formData.featured}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, featured: checked })
+                }
+              />
+              <Label htmlFor="featured" className="flex items-center gap-1.5">
+                <Star className={`h-4 w-4 ${formData.featured ? 'fill-primary text-primary' : 'text-muted-foreground'}`} />
+                {formData.featured ? 'Veículo em Destaque' : 'Marcar como Destaque'}
               </Label>
             </div>
           </div>
