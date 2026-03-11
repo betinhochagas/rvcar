@@ -6,6 +6,10 @@
   "installCommand": "npm install",
   "rewrites": [
     {
+      "source": "/links",
+      "destination": "/links.html"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://rvcar-production.up.railway.app/api/:path*"
     },
